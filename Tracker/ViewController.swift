@@ -1,19 +1,9 @@
-//
-//  ViewController.swift
-//  Tracker
-//
-//  Created by Максим Фасхетдинов on 03.04.2023.
-//
-
 import UIKit
 
-class ViewController: UIViewController {
-
+final class ViewController: UIViewController {
+    let defaultView = UIView(frame: .zero)
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
     }
-
-
 }
 
