@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		1DD7C1F629DB19810085B6A7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD7C1F529DB19810085B6A7 /* AppDelegate.swift */; };
 		1DD7C1F829DB19810085B6A7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD7C1F729DB19810085B6A7 /* SceneDelegate.swift */; };
-		1DD7C1FA29DB19810085B6A7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD7C1F929DB19810085B6A7 /* ViewController.swift */; };
+		1DD7C1FA29DB19810085B6A7 /* TrackerListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DD7C1F929DB19810085B6A7 /* TrackerListViewController.swift */; };
 		1DD7C1FF29DB19830085B6A7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1DD7C1FE29DB19830085B6A7 /* Assets.xcassets */; };
 		1DD7C20229DB19830085B6A7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1DD7C20029DB19830085B6A7 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
@@ -18,7 +18,7 @@
 		1DD7C1F229DB19810085B6A7 /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DD7C1F529DB19810085B6A7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1DD7C1F729DB19810085B6A7 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		1DD7C1F929DB19810085B6A7 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		1DD7C1F929DB19810085B6A7 /* TrackerListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerListViewController.swift; sourceTree = "<group>"; };
 		1DD7C1FE29DB19830085B6A7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1DD7C20129DB19830085B6A7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1DD7C20329DB19830085B6A7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -54,14 +54,38 @@
 		1DD7C1F429DB19810085B6A7 /* Tracker */ = {
 			isa = PBXGroup;
 			children = (
-				1DD7C1F529DB19810085B6A7 /* AppDelegate.swift */,
-				1DD7C1F729DB19810085B6A7 /* SceneDelegate.swift */,
-				1DD7C1F929DB19810085B6A7 /* ViewController.swift */,
+				1DD7C20A29DB27450085B6A7 /* Application */,
+				1DD7C20B29DB27530085B6A7 /* TrackerList */,
+				1DD7C20929DB270D0085B6A7 /* Resources */,
+			);
+			path = Tracker;
+			sourceTree = "<group>";
+		};
+		1DD7C20929DB270D0085B6A7 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
 				1DD7C1FE29DB19830085B6A7 /* Assets.xcassets */,
 				1DD7C20029DB19830085B6A7 /* LaunchScreen.storyboard */,
 				1DD7C20329DB19830085B6A7 /* Info.plist */,
 			);
-			path = Tracker;
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		1DD7C20A29DB27450085B6A7 /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				1DD7C1F529DB19810085B6A7 /* AppDelegate.swift */,
+				1DD7C1F729DB19810085B6A7 /* SceneDelegate.swift */,
+			);
+			path = Application;
+			sourceTree = "<group>";
+		};
+		1DD7C20B29DB27530085B6A7 /* TrackerList */ = {
+			isa = PBXGroup;
+			children = (
+				1DD7C1F929DB19810085B6A7 /* TrackerListViewController.swift */,
+			);
+			path = TrackerList;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -134,7 +158,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1DD7C1FA29DB19810085B6A7 /* ViewController.swift in Sources */,
+				1DD7C1FA29DB19810085B6A7 /* TrackerListViewController.swift in Sources */,
 				1DD7C1F629DB19810085B6A7 /* AppDelegate.swift in Sources */,
 				1DD7C1F829DB19810085B6A7 /* SceneDelegate.swift in Sources */,
 			);
@@ -277,7 +301,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = CCJ53Q5CP4;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Tracker/Info.plist;
+				INFOPLIST_FILE = Tracker/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -305,7 +329,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = CCJ53Q5CP4;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Tracker/Info.plist;
+				INFOPLIST_FILE = Tracker/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
