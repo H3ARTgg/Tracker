@@ -5,8 +5,9 @@ final class TabBarController: UITabBarController {
         super.viewDidLoad()
         UITabBar.appearance().backgroundColor = .ypWhite
         ///Controllers
-        let trackerListVC = TrackerListViewController()
+        let trackerListVC = TrackersViewController()
         let statisticVC = StatisticViewController()
+        let navigationVC = UINavigationController(rootViewController: trackerListVC)
         ///Images
         let trackerItemImage = UIImage(named: Constants.trackerListBarItem)?.withTintColor(.ypGray ?? .black)
         let trackerItemImageSelected = UIImage(named: Constants.trackerListBarItem)?.withTintColor(.ypBlue ?? .blue)
@@ -18,6 +19,6 @@ final class TabBarController: UITabBarController {
         statisticVC.tabBarItem = UITabBarItem(title: "Статистика", image: statisticItemImage, selectedImage: statisticItemImageSelected)
         statisticVC.tabBarItem.setTitleTextAttributes([.font : UIFont.systemFont(ofSize: 10, weight: .medium)], for: .normal)
         
-        self.viewControllers = [trackerListVC, statisticVC]
+        self.viewControllers = [navigationVC, statisticVC]
     }
 }
