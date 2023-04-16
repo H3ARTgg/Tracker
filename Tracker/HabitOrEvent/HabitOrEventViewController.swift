@@ -6,14 +6,31 @@ final class HabitOrEventViewController: UIViewController {
     private let warningLabel = UILabel()
     private let tableView = UITableView()
     private let cellsStrings: [String] = ["Категория", "Расписание"]
-    var stringCategories: [String] = []
+    private var stringCategories: [String] = []
+    private var selectedCategory: IndexPath?
+    private var daysOfTheWeek: [Int: DaysOfTheWeek] = [:]
+    private let stringsDaysOfTheWeek: [String] = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс", "Каждый день"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        guard let trackersVC = getTrackersViewController() as? TrackersViewController else {
+            assertionFailure("No trackersVC")
+            return
+        }
+        
+        for category in trackersVC.categories {
+            stringCategories.append(category.title)
+        }
+        
         view.backgroundColor = .ypWhite
-        setupTitleLabel(with: choice.rawValue)
+        setupTitleLabel(with: self.choice.rawValue)
         setupTextField()
         setupTableView()
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        view.endEditing(true)
     }
     
     required init(choice: Choice) {
@@ -23,6 +40,80 @@ final class HabitOrEventViewController: UIViewController {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc
+    private func didTapCancel() {
+        stringCategories.removeAll()
+        daysOfTheWeek.removeAll()
+    }
+}
+
+// MARK: - CategoriesViewControllerDelegate
+
+extension HabitOrEventViewController: CategoriesViewControllerDelegate {
+    func selectedCategory(indexPath: IndexPath, categories: [String]) {
+        self.stringCategories = categories
+        selectedCategory = indexPath
+        
+        let cellIndexPath = IndexPath(row: 0, section: 0)
+        guard let cell = tableView.cellForRow(at: cellIndexPath) as? HabitOrEventCell else {
+            assertionFailure("No cell for that indexPath")
+            return
+        }
+        
+        if stringCategories.count > 0 {
+            cell.detailLabelText = stringCategories[indexPath.row]
+        }
+        tableView.reloadData()
+    }
+}
+
+// MARK: - ScheduleViewControllerDelegate
+
+extension HabitOrEventViewController: ScheduleViewControllerDelegate {
+    func didRecieveDaysOfTheWeek(daysOfTheWeek: [Int: DaysOfTheWeek]) {
+        self.daysOfTheWeek.removeAll()
+        self.daysOfTheWeek = daysOfTheWeek
+        
+        let cellIndexPath = IndexPath(row: 1, section: 0)
+        guard let cell = tableView.cellForRow(at: cellIndexPath) as? HabitOrEventCell else {
+            assertionFailure("No cell for that indexPath")
+            return
+        }
+        if daysOfTheWeek.count > 0 {
+            let string = makeDetailStringForScheduleCell()
+            cell.detailLabelText = string
+        } else if daysOfTheWeek.isEmpty {
+            if cell.contentView.subviews.count == 3 {
+                cell.removeDetailLabel()
+                tableView.reloadData()
+            }
+        }
+        tableView.reloadData()
+    }
+    
+    private func makeDetailStringForScheduleCell() -> String {
+        var string = ""
+        let daysKeys = daysOfTheWeek.sorted(by: { $0.key < $1.key }).map(\.key)
+        daysKeys.forEach { [weak self] key in
+            guard let self = self else { return }
+            
+            if daysKeys.count == 1 {
+                string += self.stringsDaysOfTheWeek[key]
+            }
+            
+            if daysKeys.count == 7 {
+                string = self.stringsDaysOfTheWeek[7]
+            }
+            
+            if key != daysKeys.last && daysKeys.count != 1 && daysKeys.count != 7 {
+                string += "\(self.stringsDaysOfTheWeek[key]), "
+            } else if daysKeys.count != 1 && daysKeys.count != 7 {
+                string += self.stringsDaysOfTheWeek[key]
+            }
+        }
+        return string
     }
 }
 
@@ -71,6 +162,11 @@ extension HabitOrEventViewController: UITextFieldDelegate {
         }
         return true
     }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
 }
 
 // MARK: - TableViewDataSource
@@ -92,9 +188,7 @@ extension HabitOrEventViewController: UITableViewDataSource {
             assertionFailure("No habitEventCell")
             return UITableViewCell(frame: .zero)
         }
-        if indexPath.row == 0 {
-            
-        }
+        
         cell.title.text = cellsStrings[indexPath.row]
         
         return cell
@@ -110,6 +204,10 @@ extension HabitOrEventViewController: UITableViewDelegate {
         if indexPath.row == 0 {
             showCategoriesViewController()
         }
+        
+        if indexPath.row == 1 {
+            showScheduleViewController()
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat { 75 }
@@ -117,7 +215,17 @@ extension HabitOrEventViewController: UITableViewDelegate {
     private func showCategoriesViewController() {
         let categoriesVC = CategoriesViewController()
         categoriesVC.modalPresentationStyle = .popover
+        categoriesVC.delegate = self
+        categoriesVC.recieveCategories(categories: self.stringCategories, currentAt: self.selectedCategory)
         present(categoriesVC, animated: true)
+    }
+    
+    private func showScheduleViewController() {
+        let scheduleVC = ScheduleViewController()
+        scheduleVC.modalPresentationStyle = .popover
+        scheduleVC.delegate = self
+        scheduleVC.recieveDaysOfTheWeek(daysOfTheWeek: self.daysOfTheWeek)
+        present(scheduleVC, animated: true)
     }
 }
 

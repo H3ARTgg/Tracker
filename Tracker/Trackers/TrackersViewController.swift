@@ -4,6 +4,8 @@ protocol TrackersProtocol {
 }
 
 final class TrackersViewController: UIViewController, TrackersProtocol {
+    private let noContentLabel = UILabel()
+    private let noContentImageView = UIImageView()
     private let headerLabel = UILabel()
     private let datePicker = UIDatePicker()
     private let searchField = UISearchTextField()
@@ -18,7 +20,7 @@ final class TrackersViewController: UIViewController, TrackersProtocol {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if categories.isEmpty {
-            setupTitleAndImageIfNoContent(with: "Что будем отслеживать?")
+            setupTitleAndImageIfNoContent(with: "Что будем отслеживать?", label: noContentLabel, imageView: noContentImageView)
         }
     }
     override func viewDidLoad() {

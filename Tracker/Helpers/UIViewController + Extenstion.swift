@@ -29,9 +29,7 @@ extension UIViewController {
         ])
     }
     
-    func setupTitleAndImageIfNoContent(with text: String) {
-        let label = UILabel()
-        let imageView = UIImageView()
+    func setupTitleAndImageIfNoContent(with text: String, label: UILabel, imageView: UIImageView) {
         label.textColor = .ypBlack
         label.text = text
         label.font = .systemFont(ofSize: 12, weight: .medium)

@@ -21,21 +21,12 @@ final class HabitOrEventCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         contentView.backgroundColor = .ypBackground
+        setupTitle()
+        
         let imageViewForArrow = UIImageView(image: UIImage(named: Constants.rightArrow)!)
         imageViewForArrow.translatesAutoresizingMaskIntoConstraints = false
         
-        title.font = .systemFont(ofSize: 17, weight: .regular)
-        title.textColor = .ypBlack
-        title.textAlignment = .left
-        title.translatesAutoresizingMaskIntoConstraints = false
-        
-        contentView.addSubview(title)
         contentView.addSubview(imageViewForArrow)
-        
-        NSLayoutConstraint.activate([
-            title.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            title.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
-        ])
         
         NSLayoutConstraint.activate([
             imageViewForArrow.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
@@ -46,6 +37,19 @@ final class HabitOrEventCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    private func setupTitle() {
+        title.font = .systemFont(ofSize: 17, weight: .regular)
+        title.textColor = .ypBlack
+        title.textAlignment = .left
+        title.translatesAutoresizingMaskIntoConstraints = false
+        
+        contentView.addSubview(title)
+        
+        NSLayoutConstraint.activate([
+            title.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            title.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+        ])
+    }
     
     private func setupDetailLabel() {
         detailLabel.font = .systemFont(ofSize: 17, weight: .regular)
@@ -53,8 +57,7 @@ final class HabitOrEventCell: UITableViewCell {
         detailLabel.textAlignment = .left
         detailLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        let titleView = contentView.subviews.first(where: { $0 == title })
-        titleView?.removeFromSuperview()
+        title.removeFromSuperview()
 
         contentView.addSubview(title)
         contentView.addSubview(detailLabel)
@@ -65,5 +68,11 @@ final class HabitOrEventCell: UITableViewCell {
             detailLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             detailLabel.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 3)
         ])
+    }
+    
+    func removeDetailLabel() {
+        detailLabel.removeFromSuperview()
+        title.removeFromSuperview()
+        setupTitle()
     }
 }

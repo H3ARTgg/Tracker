@@ -2,6 +2,7 @@ import UIKit
 
 final class CategoriesCell: UITableViewCell {
     let title = UILabel()
+    let imageViewForCheckmark = UIImageView()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -25,8 +26,12 @@ final class CategoriesCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func removeCheckmark() {
+        imageViewForCheckmark.removeFromSuperview()
+    }
+    
     func setupCheckmark() {
-        let imageViewForCheckmark = UIImageView(image: UIImage(named: Constants.checkmark)!)
+        imageViewForCheckmark.image = UIImage(named: Constants.checkmark)!
         imageViewForCheckmark.translatesAutoresizingMaskIntoConstraints = false
         
         contentView.addSubview(imageViewForCheckmark)

@@ -1,5 +1,6 @@
 import Foundation
 import UIKit
+
 enum DaysOfTheWeek {
     case monday
     case tuesday
@@ -15,7 +16,7 @@ struct Tracker {
     let name: String
     let color: UIColor
     let emoji: String
-    let daysOfTheWeek: DaysOfTheWeek?
+    let daysOfTheWeek: [DaysOfTheWeek]?
     let date: Date
 }
 

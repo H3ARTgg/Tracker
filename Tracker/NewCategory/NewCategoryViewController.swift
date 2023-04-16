@@ -13,13 +13,17 @@ final class NewCategoryViewController: UIViewController {
         setupDoneButton()
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        view.endEditing(true)
+    }
+    
     @objc
     private func didTapDoneButton() {
         guard let text = textField.text else { return }
         weak var categoriesVC = self.presentingViewController as? CategoriesViewController
-        dismiss(animated: true) {
-            categoriesVC?.categories.append(text)
-        }
+        categoriesVC?.addNewCategory(category: text)
+        dismiss(animated: true)
     }
 }
 
@@ -56,6 +60,11 @@ extension NewCategoryViewController: UITextFieldDelegate {
     
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
         deactivateDoneButton()
+        return true
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
         return true
     }
 }
