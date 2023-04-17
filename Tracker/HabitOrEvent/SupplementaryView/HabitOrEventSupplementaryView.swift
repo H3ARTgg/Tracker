@@ -1,6 +1,6 @@
 import UIKit
 
-final class TrackersSupplementaryView: UICollectionReusableView {
+final class HabitOrEventSupplementaryView: UICollectionReusableView {
     let titleLabel = UILabel()
     
     override init(frame: CGRect) {
@@ -12,9 +12,9 @@ final class TrackersSupplementaryView: UICollectionReusableView {
         addSubview(titleLabel)
         
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
-            titleLabel.topAnchor.constraint(lessThanOrEqualTo: topAnchor, constant: 32),
-            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -12)
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 3),
+            titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 37),
+            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24)
         ])
     }
     

@@ -13,11 +13,21 @@
 		1D42ACD129EACEFC00CC44BB /* ScheduleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D42ACD029EACEFC00CC44BB /* ScheduleCell.swift */; };
 		1D42ACD529EAEFDB00CC44BB /* ScheduleProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D42ACD429EAEFDB00CC44BB /* ScheduleProtocols.swift */; };
 		1D42ACD729EB0DEC00CC44BB /* CategoriesProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D42ACD629EB0DEC00CC44BB /* CategoriesProtocols.swift */; };
+		1D42ACD929EC1FC100CC44BB /* HabitOrEvent + Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D42ACD829EC1FC100CC44BB /* HabitOrEvent + Views.swift */; };
+		1D42ACDB29EC233800CC44BB /* HabitOrEvent + CollectionViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D42ACDA29EC233800CC44BB /* HabitOrEvent + CollectionViewDataSource.swift */; };
+		1D42ACDD29EC30D500CC44BB /* String + Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D42ACDC29EC30D500CC44BB /* String + Extension.swift */; };
+		1D42ACDF29EC317700CC44BB /* HabitOrEventEmojiCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D42ACDE29EC317700CC44BB /* HabitOrEventEmojiCell.swift */; };
+		1D42ACE129EC36D300CC44BB /* HabitOrEventColorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D42ACE029EC36D300CC44BB /* HabitOrEventColorCell.swift */; };
+		1D42ACE329EC7F4200CC44BB /* HabitOrEventSupplementaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D42ACE229EC7F4200CC44BB /* HabitOrEventSupplementaryView.swift */; };
+		1D42ACE529EC84EC00CC44BB /* HabitOrEvent + CollectionViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D42ACE429EC84EC00CC44BB /* HabitOrEvent + CollectionViewDelegate.swift */; };
 		1DAC26C729DBA067007A54AB /* TrackersCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DAC26C629DBA067007A54AB /* TrackersCell.swift */; };
 		1DAC26C929DDA767007A54AB /* TrackersSupplementaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DAC26C829DDA767007A54AB /* TrackersSupplementaryView.swift */; };
 		1DC177D729E2EBCB00953BF2 /* NewTrackerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC177D629E2EBCB00953BF2 /* NewTrackerViewController.swift */; };
 		1DC177DD29E30F2300953BF2 /* HabitOrEventViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC177DC29E30F2300953BF2 /* HabitOrEventViewController.swift */; };
 		1DC177E129E5B5B100953BF2 /* HabitOrEventCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC177E029E5B5B100953BF2 /* HabitOrEventCell.swift */; };
+		1DC7D8A629ECCA1C00D9DC8A /* HabitOrEvent + TableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC7D8A529ECCA1C00D9DC8A /* HabitOrEvent + TableViewDataSource.swift */; };
+		1DC7D8A829ECCA3200D9DC8A /* HabitOrEvent + TableViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC7D8A729ECCA3200D9DC8A /* HabitOrEvent + TableViewDelegate.swift */; };
+		1DC7D8AA29ED9D5000D9DC8A /* Date + Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC7D8A929ED9D5000D9DC8A /* Date + Extension.swift */; };
 		1DC8DAAA29E828F900F6D39E /* CategoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC8DAA929E828F900F6D39E /* CategoriesViewController.swift */; };
 		1DC8DAAE29E852B600F6D39E /* UITextField + Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC8DAAD29E852B600F6D39E /* UITextField + Extension.swift */; };
 		1DC8DAB829E8C10700F6D39E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1DC8DAB729E8C10700F6D39E /* LaunchScreen.storyboard */; };
@@ -42,11 +52,21 @@
 		1D42ACD029EACEFC00CC44BB /* ScheduleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleCell.swift; sourceTree = "<group>"; };
 		1D42ACD429EAEFDB00CC44BB /* ScheduleProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleProtocols.swift; sourceTree = "<group>"; };
 		1D42ACD629EB0DEC00CC44BB /* CategoriesProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesProtocols.swift; sourceTree = "<group>"; };
+		1D42ACD829EC1FC100CC44BB /* HabitOrEvent + Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HabitOrEvent + Views.swift"; sourceTree = "<group>"; };
+		1D42ACDA29EC233800CC44BB /* HabitOrEvent + CollectionViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HabitOrEvent + CollectionViewDataSource.swift"; sourceTree = "<group>"; };
+		1D42ACDC29EC30D500CC44BB /* String + Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String + Extension.swift"; sourceTree = "<group>"; };
+		1D42ACDE29EC317700CC44BB /* HabitOrEventEmojiCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitOrEventEmojiCell.swift; sourceTree = "<group>"; };
+		1D42ACE029EC36D300CC44BB /* HabitOrEventColorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitOrEventColorCell.swift; sourceTree = "<group>"; };
+		1D42ACE229EC7F4200CC44BB /* HabitOrEventSupplementaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitOrEventSupplementaryView.swift; sourceTree = "<group>"; };
+		1D42ACE429EC84EC00CC44BB /* HabitOrEvent + CollectionViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HabitOrEvent + CollectionViewDelegate.swift"; sourceTree = "<group>"; };
 		1DAC26C629DBA067007A54AB /* TrackersCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackersCell.swift; sourceTree = "<group>"; };
 		1DAC26C829DDA767007A54AB /* TrackersSupplementaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackersSupplementaryView.swift; sourceTree = "<group>"; };
 		1DC177D629E2EBCB00953BF2 /* NewTrackerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTrackerViewController.swift; sourceTree = "<group>"; };
 		1DC177DC29E30F2300953BF2 /* HabitOrEventViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitOrEventViewController.swift; sourceTree = "<group>"; };
 		1DC177E029E5B5B100953BF2 /* HabitOrEventCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitOrEventCell.swift; sourceTree = "<group>"; };
+		1DC7D8A529ECCA1C00D9DC8A /* HabitOrEvent + TableViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HabitOrEvent + TableViewDataSource.swift"; sourceTree = "<group>"; };
+		1DC7D8A729ECCA3200D9DC8A /* HabitOrEvent + TableViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HabitOrEvent + TableViewDelegate.swift"; sourceTree = "<group>"; };
+		1DC7D8A929ED9D5000D9DC8A /* Date + Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date + Extension.swift"; sourceTree = "<group>"; };
 		1DC8DAA929E828F900F6D39E /* CategoriesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesViewController.swift; sourceTree = "<group>"; };
 		1DC8DAAD29E852B600F6D39E /* UITextField + Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField + Extension.swift"; sourceTree = "<group>"; };
 		1DC8DAB729E8C10700F6D39E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -95,6 +115,15 @@
 			path = NewCategory;
 			sourceTree = "<group>";
 		};
+		1D42ACE629EC850A00CC44BB /* CollectionView Delegate + DataSource */ = {
+			isa = PBXGroup;
+			children = (
+				1D42ACDA29EC233800CC44BB /* HabitOrEvent + CollectionViewDataSource.swift */,
+				1D42ACE429EC84EC00CC44BB /* HabitOrEvent + CollectionViewDelegate.swift */,
+			);
+			path = "CollectionView Delegate + DataSource";
+			sourceTree = "<group>";
+		};
 		1DC177E429E5B60200953BF2 /* NewTracker */ = {
 			isa = PBXGroup;
 			children = (
@@ -103,11 +132,42 @@
 			path = NewTracker;
 			sourceTree = "<group>";
 		};
+		1DC7D8A229ECA2A600D9DC8A /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				1DC177E029E5B5B100953BF2 /* HabitOrEventCell.swift */,
+				1D42ACE029EC36D300CC44BB /* HabitOrEventColorCell.swift */,
+				1D42ACDE29EC317700CC44BB /* HabitOrEventEmojiCell.swift */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
+		1DC7D8A329ECA2C500D9DC8A /* SupplementaryView */ = {
+			isa = PBXGroup;
+			children = (
+				1D42ACE229EC7F4200CC44BB /* HabitOrEventSupplementaryView.swift */,
+			);
+			path = SupplementaryView;
+			sourceTree = "<group>";
+		};
+		1DC7D8A429ECC9DE00D9DC8A /* TableView Delegate + DataSource */ = {
+			isa = PBXGroup;
+			children = (
+				1DC7D8A529ECCA1C00D9DC8A /* HabitOrEvent + TableViewDataSource.swift */,
+				1DC7D8A729ECCA3200D9DC8A /* HabitOrEvent + TableViewDelegate.swift */,
+			);
+			path = "TableView Delegate + DataSource";
+			sourceTree = "<group>";
+		};
 		1DC8DAA729E5FF7600F6D39E /* HabitOrEvent */ = {
 			isa = PBXGroup;
 			children = (
 				1DC177DC29E30F2300953BF2 /* HabitOrEventViewController.swift */,
-				1DC177E029E5B5B100953BF2 /* HabitOrEventCell.swift */,
+				1D42ACD829EC1FC100CC44BB /* HabitOrEvent + Views.swift */,
+				1DC7D8A429ECC9DE00D9DC8A /* TableView Delegate + DataSource */,
+				1D42ACE629EC850A00CC44BB /* CollectionView Delegate + DataSource */,
+				1DC7D8A329ECA2C500D9DC8A /* SupplementaryView */,
+				1DC7D8A229ECA2A600D9DC8A /* Cells */,
 			);
 			path = HabitOrEvent;
 			sourceTree = "<group>";
@@ -206,11 +266,13 @@
 			isa = PBXGroup;
 			children = (
 				1DD7C21229DB2BCF0085B6A7 /* Constants.swift */,
+				1D42ACDC29EC30D500CC44BB /* String + Extension.swift */,
 				1DD7C21429DB2C820085B6A7 /* UIColor + Extension.swift */,
 				1D0EB51F29DDCA9800767D8B /* UIImage + Extension.swift */,
 				1DC8DAAD29E852B600F6D39E /* UITextField + Extension.swift */,
 				1DC8DABD29E988B500F6D39E /* UIView + Extension.swift */,
 				1DC8DABB29E8D82200F6D39E /* UIViewController + Extenstion.swift */,
+				1DC7D8A929ED9D5000D9DC8A /* Date + Extension.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -287,9 +349,14 @@
 			files = (
 				1DAC26C729DBA067007A54AB /* TrackersCell.swift in Sources */,
 				1DC8DABA29E8CD6200F6D39E /* NewCategoryViewController.swift in Sources */,
+				1D42ACE129EC36D300CC44BB /* HabitOrEventColorCell.swift in Sources */,
 				1DD7C1FA29DB19810085B6A7 /* TrackersViewController.swift in Sources */,
+				1D42ACE529EC84EC00CC44BB /* HabitOrEvent + CollectionViewDelegate.swift in Sources */,
 				1DC8DABC29E8D82200F6D39E /* UIViewController + Extenstion.swift in Sources */,
 				1DD7C21529DB2C820085B6A7 /* UIColor + Extension.swift in Sources */,
+				1DC7D8AA29ED9D5000D9DC8A /* Date + Extension.swift in Sources */,
+				1DC7D8A629ECCA1C00D9DC8A /* HabitOrEvent + TableViewDataSource.swift in Sources */,
+				1D42ACD929EC1FC100CC44BB /* HabitOrEvent + Views.swift in Sources */,
 				1DC8DAC029E9A00C00F6D39E /* CategoriesCell.swift in Sources */,
 				1DC8DAAA29E828F900F6D39E /* CategoriesViewController.swift in Sources */,
 				1D0EB52029DDCA9800767D8B /* UIImage + Extension.swift in Sources */,
@@ -307,8 +374,13 @@
 				1D42ACD729EB0DEC00CC44BB /* CategoriesProtocols.swift in Sources */,
 				1DD7C1F829DB19810085B6A7 /* SceneDelegate.swift in Sources */,
 				1DC177D729E2EBCB00953BF2 /* NewTrackerViewController.swift in Sources */,
+				1D42ACDD29EC30D500CC44BB /* String + Extension.swift in Sources */,
+				1D42ACDF29EC317700CC44BB /* HabitOrEventEmojiCell.swift in Sources */,
 				1D42ACD129EACEFC00CC44BB /* ScheduleCell.swift in Sources */,
+				1D42ACE329EC7F4200CC44BB /* HabitOrEventSupplementaryView.swift in Sources */,
 				1DD7C21329DB2BCF0085B6A7 /* Constants.swift in Sources */,
+				1D42ACDB29EC233800CC44BB /* HabitOrEvent + CollectionViewDataSource.swift in Sources */,
+				1DC7D8A829ECCA3200D9DC8A /* HabitOrEvent + TableViewDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

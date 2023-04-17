@@ -1,8 +1,8 @@
 import UIKit
 
 final class HabitOrEventCell: UITableViewCell {
-    let title = UILabel()
     private let detailLabel = UILabel()
+    let title = UILabel()
     var detailLabelText: String {
         get {
             if let text = detailLabel.text {

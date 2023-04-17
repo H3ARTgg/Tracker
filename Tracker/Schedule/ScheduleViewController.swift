@@ -4,6 +4,8 @@ final class ScheduleViewController: UIViewController {
     private let cellIdentifier = "scheduleCell"
     private let tableView = UITableView()
     private var doneButton = UIButton()
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
     private let daysOfTheWeekStrings = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
     private var daysOfTheWeek: [Int: DaysOfTheWeek] = [:]
     weak var delegate: ScheduleViewControllerDelegate?
@@ -11,6 +13,7 @@ final class ScheduleViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
+        setupScrollViewAndContentView(scrollView: scrollView, contentView: contentView)
         setupTitleLabel(with: "Расписание")
         setupTableView()
         setupDoneButton()
@@ -95,7 +98,7 @@ extension ScheduleViewController: UITableViewDataSource {
 
 extension ScheduleViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        74
+        75
     }
 }
 
@@ -105,6 +108,7 @@ extension ScheduleViewController {
     private func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.allowsSelection = false
         tableView.register(ScheduleCell.self, forCellReuseIdentifier: cellIdentifier)
         tableView.isScrollEnabled = false
         tableView.makeCornerRadius(16)
@@ -112,19 +116,13 @@ extension ScheduleViewController {
         tableView.separatorColor = .ypGray
         tableView.backgroundColor = .ypWhite
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(tableView)
-        
-        
-        var amount: CGFloat = 0
-        for _ in 0...6 {
-            amount += 74
-        }
+        contentView.addSubview(tableView)
         
         NSLayoutConstraint.activate([
-            tableView.heightAnchor.constraint(equalToConstant: amount),
-            tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: 65),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
+            tableView.heightAnchor.constraint(equalToConstant: 520),
+            tableView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
         ])
     }
     

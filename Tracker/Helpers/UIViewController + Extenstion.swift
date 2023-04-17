@@ -55,4 +55,29 @@ extension UIViewController {
             label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
         ])
     }
+    
+    func setupScrollViewAndContentView(scrollView: UIScrollView, contentView: UIView, withExtraSpace: CGFloat? = nil) {
+        var extraSpace: CGFloat = 0
+        if let withExtraSpace = withExtraSpace {
+            extraSpace += withExtraSpace
+        }
+        scrollView.bounces = true
+        scrollView.frame = view.bounds
+        scrollView.contentSize = CGSize(width: view.frame.width, height: view.frame.height + extraSpace)
+        scrollView.minimumZoomScale = 1
+        scrollView.maximumZoomScale = 1
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(scrollView)
+        
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: 65),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        
+        contentView.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height + extraSpace)
+        contentView.backgroundColor = .ypWhite
+        scrollView.addSubview(contentView)
+    }
 }

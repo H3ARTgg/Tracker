@@ -1,13 +1,18 @@
 import UIKit
 
 final class TrackersCell: UICollectionViewCell {
+    var selectionColor: UIColor? {
+        didSet {
+            daysButton.backgroundColor = selectionColor
+            cardView.backgroundColor = selectionColor
+        }
+    }
     let cardView = UIView()
     let cardText = UILabel()
     let cardEmojiPlaceholder = UIView()
     let cardEmoji = UILabel()
     let daysLabel = UILabel()
     var daysButton = UIButton()
-    var selectionColor = UIColor.selection1
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -43,7 +48,6 @@ extension TrackersCell {
             cardView.leadingAnchor.constraint(equalTo: leadingAnchor),
             cardView.trailingAnchor.constraint(equalTo: trailingAnchor),
             cardView.topAnchor.constraint(equalTo: topAnchor),
-            cardView.heightAnchor.constraint(equalToConstant: 90)
         ])
     }
     

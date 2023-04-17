@@ -50,7 +50,9 @@ final class CategoriesViewController: UIViewController {
         if stringCategories.isEmpty {
             removeNoContentViews()
         }
-        
+        if stringCategories.contains(category) {
+            return
+        }
         self.stringCategories.append(category)
         reloadCurrentCheckmarkForLastCreatedCategory()
         tableView.removeFromSuperview()
