@@ -29,14 +29,14 @@ extension UIViewController {
         ])
     }
     
-    func setupTitleAndImageIfNoContent(with text: String, label: UILabel, imageView: UIImageView) {
+    func setupTitleAndImageIfNoContent(with text: String, label: UILabel, imageView: UIImageView, image: UIImage) {
         label.textColor = .ypBlack
         label.text = text
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.textAlignment = .center
         label.numberOfLines = 2
         
-        imageView.image = UIImage(named: Constants.noTrackersImage)
+        imageView.image = image
         
         label.translatesAutoresizingMaskIntoConstraints = false
         imageView.translatesAutoresizingMaskIntoConstraints = false

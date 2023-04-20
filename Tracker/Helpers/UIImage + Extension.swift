@@ -4,6 +4,10 @@ extension UIImage {
     static let chevronLeft = UIImage(systemName: "chevron.left")!
     static let chevronRight = UIImage(systemName: "chevron.right")!
     static let xMark = UIImage(systemName: "xmark.circle.fill")!
+    static let noTrackers = UIImage(named: Constants.noTrackersImage)!
+    static let noResult = UIImage(named: Constants.noResultImage)!
+    static let plusForButton = UIImage(named: Constants.plusBarItem)!
+    static let doneCheckmark = UIImage(named: "done_checkmark")!
     
     func imageResized(to size: CGSize) -> UIImage {
         return UIGraphicsImageRenderer(size: size).image { _ in

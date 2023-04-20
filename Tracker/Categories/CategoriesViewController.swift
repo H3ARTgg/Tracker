@@ -14,7 +14,7 @@ final class CategoriesViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if stringCategories.isEmpty {
-            setupTitleAndImageIfNoContent(with: "Привычки и события можно объединить по смыслу", label: noContentLabel, imageView: noContentImageView)
+            setupTitleAndImageIfNoContent(with: "Привычки и события можно объединить по смыслу", label: noContentLabel, imageView: noContentImageView, image: .noTrackers)
             tableView.isHidden = true
         } else {
             tableView.isHidden = false

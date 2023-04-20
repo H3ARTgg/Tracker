@@ -1,18 +1,44 @@
 import UIKit
+import Foundation
 
 final class TrackersCell: UICollectionViewCell {
+    private let daysLabel = UILabel()
+    private let cardEmojiPlaceholder = UIView()
+    private var daysButton = UIButton()
+    private let cardView = UIView()
+    private (set) var indexPath: IndexPath?
     var selectionColor: UIColor? {
         didSet {
             daysButton.backgroundColor = selectionColor
             cardView.backgroundColor = selectionColor
         }
     }
-    let cardView = UIView()
     let cardText = UILabel()
-    let cardEmojiPlaceholder = UIView()
     let cardEmoji = UILabel()
-    let daysLabel = UILabel()
-    var daysButton = UIButton()
+    var delegate: TrackersCellDelegate?
+    var daysCounter: Int = 0 {
+        didSet {
+            let lastInt = Int(String(String(daysCounter).last!))
+            if let int = lastInt, daysCounter < 11 || daysCounter > 20 {
+                switch int {
+                case 0:
+                    daysLabel.text? = "\(daysCounter) дней"
+                case 1:
+                    daysLabel.text? = "\(daysCounter) день"
+                case 2...4:
+                    daysLabel.text? = "\(daysCounter) дня"
+                case 5...9:
+                    daysLabel.text? = "\(daysCounter) дней"
+                default:
+                    daysLabel.text? = "\(daysCounter) дней"
+                }
+            } else {
+                daysLabel.text? = "\(daysCounter) дней"
+            }
+        }
+    }
+    private var willDoubleTap: Bool = false
+    var id: UInt = 0
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -31,7 +57,52 @@ final class TrackersCell: UICollectionViewCell {
     
     @objc
     private func addDay() {
-        
+        if !willDoubleTap {
+            setDone()
+            daysCounter += 1
+            delegate?.didRecieveNewRecord(true, for: id)
+        } else {
+            setNotDone()
+            daysCounter -= 1
+            delegate?.didRecieveNewRecord(false, for: id)
+        }
+    }
+    
+    private func setNotDone() {
+        daysButton.setImage(.plusForButton.imageResized(to: CGSize(width: 11, height: 11)), for: .normal)
+        daysButton.layer.opacity = 1
+        willDoubleTap = false
+    }
+    
+    private func setDone() {
+        willDoubleTap = true
+        daysButton.layer.opacity = 0.5
+        daysButton.setImage(.doneCheckmark.imageResized(to: CGSize(width: 11, height: 11)), for: .normal)
+        daysButton.tintColor = .ypWhite
+    }
+    
+    func configCell(
+        delegate: TrackersCellDelegate,
+        id: UInt,
+        color: UIColor,
+        trackerName: String,
+        emoji: String,
+        daysCount: Int,
+        isSameDate: Bool,
+        currentDate: Date
+    ) {
+        self.id = id
+        self.delegate = delegate
+        self.selectionColor = color
+        self.cardText.text = trackerName
+        self.cardEmoji.text = emoji
+        daysCounter = daysCount
+        isSameDate ? setDone() : setNotDone()
+        if currentDate.isBiggerThanRealTime() {
+            daysButton.isUserInteractionEnabled = false
+        } else {
+            daysButton.isUserInteractionEnabled = true
+        }
     }
 }
 
@@ -93,8 +164,8 @@ extension TrackersCell {
     }
     
     private func setupDaysButton() {
-        let plusImage = UIImage(named: Constants.plusBarItem)?.imageResized(to: CGSize(width: 11, height: 11))
-        daysButton = UIButton.systemButton(with: plusImage!, target: self, action: #selector(addDay))
+        let plusImage = UIImage.plusForButton.imageResized(to: CGSize(width: 11, height: 11))
+        daysButton = UIButton.systemButton(with: plusImage, target: self, action: #selector(addDay))
         daysButton.tintColor = .ypWhite
         daysButton.translatesAutoresizingMaskIntoConstraints = false
         daysButton.backgroundColor = selectionColor ?? UIColor.white
@@ -113,6 +184,7 @@ extension TrackersCell {
     
     private func setupDaysLabel() {
         daysLabel.numberOfLines = 1
+        daysLabel.text = "0 дней"
         daysLabel.translatesAutoresizingMaskIntoConstraints = false
         daysLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         daysLabel.textColor = .ypBlack

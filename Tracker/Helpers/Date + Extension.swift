@@ -19,6 +19,15 @@ extension Date {
         return results.contains(false) ? false : true
     }
     
+    func isBiggerThanRealTime() -> Bool {
+        let components: [Calendar.Component] = [.day, .month, .year]
+        var results: [Bool] = []
+        for component in components {
+            results.append(distance(from: Date(), only: component) > 0)
+        }
+        return results.contains(true) ? true : false
+    }
+    
     /// Get weekday of date.
     func weekDay() -> Int {
         return Calendar.current.component(.weekday, from: self)

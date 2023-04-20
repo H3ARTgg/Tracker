@@ -4,6 +4,7 @@ struct Constants {
     static let plusBarItem = "plus_bar_item"
     static let plusButton = "plus_button"
     static let noTrackersImage = "no_trackers"
+    static let noResultImage = "no_result"
     static let rightArrow = "right_arrow"
     static let checkmark = "checkmark"
     static let selectBorder = "select_border"

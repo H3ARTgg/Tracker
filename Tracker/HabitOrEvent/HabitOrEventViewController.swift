@@ -38,7 +38,7 @@ final class HabitOrEventViewController: UIViewController {
         
         categories = trackersVC.categories
         
-        setupScrollViewAndContentView(scrollView: scrollView, contentView: contentView, withExtraSpace: 10)
+        setupScrollViewAndContentView(scrollView: scrollView, contentView: contentView, withExtraSpace: UIScreen.main.bounds.height / 3)
         scrollView.delegate = self
         setupTitleLabel(with: self.choice.rawValue)
         setupTextField()
@@ -78,7 +78,7 @@ final class HabitOrEventViewController: UIViewController {
             }
             
             let tracker = Tracker(
-                id: UInt(stringCategories.count + text.count + selectedEmoji.row + selectedColor.row + daysOfTheWeek.count),
+                id: UInt(stringCategories.count) + UInt.random(in: 0...20000),
                 name: text,
                 color: UIColor.selectionColors[selectedColor.row]!,
                 emoji: String.emojisArray[selectedEmoji.row],

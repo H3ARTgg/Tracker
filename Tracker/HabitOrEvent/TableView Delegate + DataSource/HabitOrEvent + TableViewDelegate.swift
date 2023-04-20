@@ -18,6 +18,7 @@ extension HabitOrEventViewController: UITableViewDelegate {
         categoriesVC.modalPresentationStyle = .popover
         categoriesVC.delegate = self
         categoriesVC.recieveCategories(categories: self.stringCategories, currentAt: self.selectedCategory)
+        textField.resignFirstResponder()
         present(categoriesVC, animated: true)
     }
     
@@ -26,6 +27,7 @@ extension HabitOrEventViewController: UITableViewDelegate {
         scheduleVC.modalPresentationStyle = .popover
         scheduleVC.delegate = self
         scheduleVC.recieveDaysOfTheWeek(daysOfTheWeek: self.daysOfTheWeek)
+        textField.resignFirstResponder()
         present(scheduleVC, animated: true)
     }
 }

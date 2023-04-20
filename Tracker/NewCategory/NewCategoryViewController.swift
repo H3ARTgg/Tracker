@@ -25,6 +25,15 @@ final class NewCategoryViewController: UIViewController {
         categoriesVC?.addNewCategory(category: text)
         dismiss(animated: true)
     }
+    
+    @objc
+    private func didInteractWithTextField() {
+        if textField.text?.count == 0 {
+            deactivateDoneButton()
+        } else {
+            activateDoneButton()
+        }
+    }
 }
 
 // MARK: - TextFieldDelegate
@@ -40,11 +49,7 @@ extension NewCategoryViewController: UITextFieldDelegate {
             
             let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
             let result = updatedText.count <= 25
-            if updatedText.count == 0 {
-                deactivateDoneButton()
-            } else {
-                activateDoneButton()
-            }
+            
             return result
         }
     
@@ -81,6 +86,7 @@ extension NewCategoryViewController {
         textField.rightView?.isHidden = true
         textField.backgroundColor = .ypBackground
         textField.font = .systemFont(ofSize: 17, weight: .regular)
+        textField.addTarget(self, action: #selector(didInteractWithTextField), for: .allEditingEvents)
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.makeCornerRadius(16)
         view.addSubview(textField)

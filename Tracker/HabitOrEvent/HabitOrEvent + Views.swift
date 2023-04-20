@@ -4,6 +4,7 @@ extension HabitOrEventViewController {
     func setupCollectionView() {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .ypWhite
+        collectionView.isScrollEnabled = false
         contentView.addSubview(collectionView)
         
         NSLayoutConstraint.activate([
