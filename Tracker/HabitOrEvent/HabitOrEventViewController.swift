@@ -1,10 +1,16 @@
 import UIKit
 
+protocol HabitOrEventDelegate: AnyObject {
+    var stringCategories: [String]? { get }
+    func didRecieveTracker(_ tracker: Tracker, forCategoryTitle category: String) throws
+}
+
 final class HabitOrEventViewController: UIViewController {
     private var trackersVC: TrackersViewController?
+    private weak var delegate: HabitOrEventDelegate?
     private (set) var stringCategories: [String] = []
     var categories: [TrackerCategory] = []
-    private (set) var daysOfTheWeek: [Int: DaysOfTheWeek] = [:]
+    private (set) var daysOfTheWeek: [Int: WeekDay] = [:]
     private (set) var choice: Choice!
     let emojiCellIdentifier = "emojiCell"
     let colorCellIdentifier = "colorCell"
@@ -26,17 +32,21 @@ final class HabitOrEventViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
-        guard let trackersVC = getTrackersViewController() as? TrackersViewController else {
-            assertionFailure("No trackersVC")
-            return
-        }
-        self.trackersVC = trackersVC
+//        guard let trackersVC = getTrackersViewController() as? TrackersViewController else {
+//            assertionFailure("No trackersVC")
+//            return
+//        }
+//
+//        self.trackersVC = trackersVC
+//
+//        for category in trackersVC.categories {
+//            stringCategories.append(category.title)
+//        }
         
-        for category in trackersVC.categories {
-            stringCategories.append(category.title)
+//        categories = trackersVC.categories
+        if let categories = delegate?.stringCategories {
+            self.stringCategories = categories
         }
-        
-        categories = trackersVC.categories
         
         setupScrollViewAndContentView(scrollView: scrollView, contentView: contentView, withExtraSpace: UIScreen.main.bounds.height / 3)
         scrollView.delegate = self
@@ -47,9 +57,10 @@ final class HabitOrEventViewController: UIViewController {
         setupButtonsWithSelectorsFor(done: #selector(didTapCreate), cancel: #selector(didTapCancel), with: stackViewForButtons)
     }
     
-    required init(choice: Choice) {
+    required init(choice: Choice, delegate: HabitOrEventDelegate) {
         super.init(nibName: .none, bundle: .none)
         self.choice = choice
+        self.delegate = delegate
     }
     
     required init?(coder: NSCoder) {
@@ -72,52 +83,58 @@ final class HabitOrEventViewController: UIViewController {
             let text = textField.text,
             textField.text?.count != 0 {
             
-            var daysValues: [DaysOfTheWeek]?
+            var daysValues: [WeekDay]?
             if choice == Choice.habit && daysOfTheWeek.count != 0 {
                 daysValues = daysOfTheWeek.map(\.value)
             }
             
             let tracker = Tracker(
-                id: UInt(stringCategories.count) + UInt.random(in: 0...20000),
+                id: UUID(),
                 name: text,
                 color: UIColor.selectionColors[selectedColor.row]!,
                 emoji: String.emojisArray[selectedEmoji.row],
                 daysOfTheWeek: daysValues ?? nil,
-                date: Date()
+                createdAt: Date()
             )
-            
-            var newCategories: [TrackerCategory] = []
-            for category in categories {
-                var trackersArray: [Tracker] = []
-                for tracker in category.trackers {
-                    trackersArray.append(tracker)
-                }
-                
-                if category.title == stringCategories[selectedCategory.row] {
-                    trackersArray.append(tracker)
-                }
-                
-                let newCategory = TrackerCategory(title: category.title, trackers: trackersArray)
-                newCategories.append(newCategory)
+            do {
+                try delegate?.didRecieveTracker(tracker, forCategoryTitle: stringCategories[selectedCategory.row])
+            } catch {
+                assertionFailure("can't try delegate method")
             }
             
-            if !categories.contains(where: { $0.title == stringCategories[selectedCategory.row]}) {
-                let newCategory = TrackerCategory(title: stringCategories[selectedCategory.row], trackers: [tracker])
-                
-                newCategories.append(newCategory)
-            }
-            
-            if categories.count == 0 {
-                let newCategory = TrackerCategory(
-                    title: stringCategories[selectedCategory.row],
-                    trackers: [tracker]
-                )
-                
-                let newCategoriesFor: [TrackerCategory] = [newCategory]
-                trackersVC?.didReceiveCategories(categories: newCategoriesFor)
-            } else {
-                trackersVC?.didReceiveCategories(categories: newCategories)
-            }
+//            var newCategories: [TrackerCategory] = []
+//            for category in categories {
+//                var trackersArray: [Tracker] = []
+//                for tracker in category.trackers {
+//                    trackersArray.append(tracker)
+//                }
+//
+//                if category.title == stringCategories[selectedCategory.row] {
+//                    trackersArray.append(tracker)
+//                }
+//
+//                let newCategory = TrackerCategory(title: category.title, trackers: trackersArray, createdAt: Date())
+//                newCategories.append(newCategory)
+//            }
+//
+//            if !categories.contains(where: { $0.title == stringCategories[selectedCategory.row]}) {
+//                let newCategory = TrackerCategory(title: stringCategories[selectedCategory.row], trackers: [tracker], createdAt: Date())
+//
+//                newCategories.append(newCategory)
+//            }
+//
+//            if categories.count == 0 {
+//                let newCategory = TrackerCategory(
+//                    title: stringCategories[selectedCategory.row],
+//                    trackers: [tracker],
+//                    createdAt: Date()
+//                )
+//
+//                let newCategoriesFor: [TrackerCategory] = [newCategory]
+//                trackersVC?.didReceiveCategories(categories: newCategoriesFor)
+//            } else {
+//                trackersVC?.didReceiveCategories(categories: newCategories)
+//            }
             weak var presentingVC = self.presentingViewController
             dismiss(animated: true)
             presentingVC?.dismiss(animated: true)
@@ -190,7 +207,7 @@ extension HabitOrEventViewController: CategoriesViewControllerDelegate {
 // MARK: - ScheduleViewControllerDelegate
 
 extension HabitOrEventViewController: ScheduleViewControllerDelegate {
-    func didRecieveDaysOfTheWeek(daysOfTheWeek: [Int: DaysOfTheWeek]) {
+    func didRecieveDaysOfTheWeek(daysOfTheWeek: [Int: WeekDay]) {
         self.daysOfTheWeek.removeAll()
         self.daysOfTheWeek = daysOfTheWeek
         isReadyForCreate()
@@ -218,17 +235,17 @@ extension HabitOrEventViewController: ScheduleViewControllerDelegate {
         daysKeys.forEach { key in
             
             if daysKeys.count == 1 {
-                string += String.stringsDaysOfTheWeek[key]
+                string += daysOfTheWeek[key]!.shortName
             }
             
             if daysKeys.count == 7 {
-                string = String.stringsDaysOfTheWeek[7]
+                string = daysOfTheWeek[0]!.everyday
             }
             
             if key != daysKeys.last && daysKeys.count != 1 && daysKeys.count != 7 {
-                string += "\(String.stringsDaysOfTheWeek[key]), "
+                string += "\(daysOfTheWeek[key]!.shortName), "
             } else if daysKeys.count != 1 && daysKeys.count != 7 {
-                string += String.stringsDaysOfTheWeek[key]
+                string += daysOfTheWeek[key]!.shortName
             }
         }
         return string

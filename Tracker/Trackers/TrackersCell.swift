@@ -38,7 +38,7 @@ final class TrackersCell: UICollectionViewCell {
         }
     }
     private var willDoubleTap: Bool = false
-    var id: UInt = 0
+    var id = UUID()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -83,12 +83,12 @@ final class TrackersCell: UICollectionViewCell {
     
     func configCell(
         delegate: TrackersCellDelegate,
-        id: UInt,
+        id: UUID,
         color: UIColor,
         trackerName: String,
         emoji: String,
         daysCount: Int,
-        isSameDate: Bool,
+        isRecordExists: Bool,
         currentDate: Date
     ) {
         self.id = id
@@ -97,7 +97,7 @@ final class TrackersCell: UICollectionViewCell {
         self.cardText.text = trackerName
         self.cardEmoji.text = emoji
         daysCounter = daysCount
-        isSameDate ? setDone() : setNotDone()
+        isRecordExists ? setDone() : setNotDone()
         if currentDate.isBiggerThanRealTime() {
             daysButton.isUserInteractionEnabled = false
         } else {

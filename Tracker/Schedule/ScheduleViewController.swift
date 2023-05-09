@@ -7,7 +7,7 @@ final class ScheduleViewController: UIViewController {
     private let scrollView = UIScrollView()
     private let contentView = UIView()
     private let daysOfTheWeekStrings = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
-    private var daysOfTheWeek: [Int: DaysOfTheWeek] = [:]
+    private var daysOfTheWeek: [Int: WeekDay] = [:]
     weak var delegate: ScheduleViewControllerDelegate?
     
     override func viewDidLoad() {
@@ -30,7 +30,7 @@ final class ScheduleViewController: UIViewController {
 // MARK: - ScheduleViewControllerProtocol
 
 extension ScheduleViewController: ScheduleViewControllerProtocol {
-    func recieveDaysOfTheWeek(daysOfTheWeek: [Int: DaysOfTheWeek]) {
+    func recieveDaysOfTheWeek(daysOfTheWeek: [Int: WeekDay]) {
         self.daysOfTheWeek = daysOfTheWeek
         tableView.reloadData()
     }
@@ -42,29 +42,31 @@ extension ScheduleViewController: ScheduleCellDelegate {
     func choiceForDay(_ check: Bool, indexPath: IndexPath) {
         switch indexPath.row {
         case 0:
-            addToArray(check, for: .monday, with: indexPath)
+            addToArray(check, for: DaysOfTheWeek.monday.rawValue, with: indexPath)
         case 1:
-            addToArray(check, for: .tuesday, with: indexPath)
+            addToArray(check, for: DaysOfTheWeek.tuesday.rawValue, with: indexPath)
         case 2:
-            addToArray(check, for: .wednesday, with: indexPath)
+            addToArray(check, for: DaysOfTheWeek.wednesday.rawValue, with: indexPath)
         case 3:
-            addToArray(check, for: .thursday, with: indexPath)
+            addToArray(check, for: DaysOfTheWeek.thursday.rawValue, with: indexPath)
         case 4:
-            addToArray(check, for: .friday, with: indexPath)
+            addToArray(check, for: DaysOfTheWeek.friday.rawValue, with: indexPath)
         case 5:
-            addToArray(check, for: .saturday, with: indexPath)
+            addToArray(check, for: DaysOfTheWeek.saturday.rawValue, with: indexPath)
         case 6:
-            addToArray(check, for: .sunday, with: indexPath)
+            addToArray(check, for: DaysOfTheWeek.sunday.rawValue, with: indexPath)
         default:
             assertionFailure("out of cases in choiceForDay")
         }
     }
     
-    private func addToArray(_ check: Bool, for dayCase: DaysOfTheWeek, with indexPath: IndexPath) {
+    private func addToArray(_ check: Bool, for dayNumber: Int, with indexPath: IndexPath) {
         if check {
-            daysOfTheWeek[indexPath.row] = dayCase
+            daysOfTheWeek[indexPath.row] = WeekDay(weekDay: dayNumber)
         } else {
-            if daysOfTheWeek.contains(where: { $0.value == dayCase }) {
+            if daysOfTheWeek.contains(where: { dict in
+                dict.value.weekDay == dayNumber
+            }) {
                 daysOfTheWeek.removeValue(forKey: indexPath.row)
             }
         }
@@ -85,10 +87,10 @@ extension ScheduleViewController: UITableViewDataSource {
         }
         let daysKeys = daysOfTheWeek.sorted(by: { $0.key < $1.key }).map(\.key)
         if daysKeys.contains(indexPath.row) {
-            cell.switcher.setOn(true, animated: false)
+            cell.setOn(true)
         }
         cell.delegate = self
-        cell.title.text = daysOfTheWeekStrings[indexPath.row]
+        cell.setTitle(with: daysOfTheWeekStrings[indexPath.row])
         
         return cell
     }

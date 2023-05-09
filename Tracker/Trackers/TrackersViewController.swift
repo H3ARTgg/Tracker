@@ -1,6 +1,6 @@
 import UIKit
 
-final class TrackersViewController: UIViewController {
+final class TrackersViewController: UIViewController, NewTrackerDelegate {
     private let noContentLabel = UILabel()
     private let noContentImageView = UIImageView()
     private let headerLabel = UILabel()
@@ -8,22 +8,34 @@ final class TrackersViewController: UIViewController {
     private let searchField = UISearchTextField()
     private var searchCancelButton = UIButton()
     private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-    private var visibleCategories: [TrackerCategory] = []
-    private var completedTrackers: [TrackerRecord] = []
-    private var completedTrackersIds: Set<UInt> = []
+    var stringCategories: [String]? {
+        get {
+            do {
+                return try trackerCategoryStore.getAllCategoriesTitles()
+            } catch {
+                return []
+            }
+        }
+    }
     private var currentDate: Date = Date()
-    private (set) var categories: [TrackerCategory] = []
+    private let trackerCategoryStore = TrackerCategoryStore()
+    private let trackerStore = TrackerStore()
+    private let trackerRecordStore = TrackerRecordStore()
+    private let uiColorMarshalling = UIColorMarshalling()
+    private var searchText: String = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
-        isCategoriesEmpty()
+        
         setupNavigationItem()
         setupHeaderLabel()
         setupDatePicker()
         setupSearchFieldFor(searchCancel: false)
         setupCollectionView()
-        showTrackersForCurrentDate()
+        
+        try? trackerStore.showTrackersByDayOfTheWeekFor(date: currentDate, searchText: searchText)
+        isNeedToSetupNoContentUI()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -31,54 +43,69 @@ final class TrackersViewController: UIViewController {
         view.endEditing(true)
     }
     
-    private func isCategoriesEmpty() {
-        if view.subviews.contains(noContentLabel) {
-            removeNoContent()
-        }
-        
-        if categories.isEmpty {
-            setupTitleAndImageIfNoContent(with: "Что будем отслеживать?", label: noContentLabel, imageView: noContentImageView, image: .noTrackers)
-        }
-        
-        if !categories.isEmpty && visibleCategories.isEmpty {
-            setupTitleAndImageIfNoContent(with: "Что будем отслеживать?", label: noContentLabel, imageView: noContentImageView, image: .noTrackers)
-        }
-    }
-    
+    /// Любое взаимодействие с поиском
     @objc
     private func didInteractWithSearch() {
         let currentText = searchField.text ?? ""
-        
-        if currentText.count > 0 {
-            showSearchResultFor(currentText)
-        } else {
-            showTrackersForCurrentDate()
-        }
+        self.searchText = currentText
+        try? trackerStore.showTrackersByDayOfTheWeekFor(date: currentDate, searchText: searchText)
+        isNeedToSetupNoContentUI()
+        collectionView.reloadData()
     }
     
+    /// Нажатие на "+"
     @objc
     private func addNewTracker() {
         resetSearchField()
-        showTrackersForCurrentDate()
-        let newTrackerVC = NewTrackerViewController()
+        let newTrackerVC = NewTrackerViewController(delegate: self)
         newTrackerVC.modalPresentationStyle = .popover
         present(newTrackerVC, animated: true)
     }
     
+    /// Изменение даты
     @objc
     private func didDateChanged() {
         currentDate = datePicker.date
-        showTrackersForCurrentDate()
+        do {
+            try trackerStore.showTrackersByDayOfTheWeekFor(date: currentDate, searchText: searchText)
+        } catch {}
+        collectionView.reloadData()
     }
     
+    /// Нажатие на кнопку "Отменить" при поиске
     @objc
     private func didTapCancelSearchButton() {
         view.endEditing(true)
         resetSearchField()
-        isCategoriesEmpty()
-        showTrackersForCurrentDate()
+        self.searchText = ""
+        try? trackerStore.showTrackersByDayOfTheWeekFor(date: currentDate, searchText: searchText)
+        isNeedToSetupNoContentUI()
     }
     
+    /// Проверяет, нужно ли добавлять no content UI или нет.
+    /// Для поиска выводит другой no content UI
+    private func isNeedToSetupNoContentUI() {
+        if view.subviews.contains(noContentLabel) {
+            removeNoContent()
+        }
+        
+        let categories = try? trackerCategoryStore.getAllCategoriesTitles()
+        
+        if categories == nil {
+            setupTitleAndImageIfNoContent(with: "Что будем отслеживать?", label: noContentLabel, imageView: noContentImageView, image: .noTrackers)
+        }
+        
+        if categories != nil && trackerStore.numberOfSections == 0 {
+            setupTitleAndImageIfNoContent(with: "Что будем отслеживать?", label: noContentLabel, imageView: noContentImageView, image: .noTrackers)
+        }
+        
+        if trackerStore.numberOfFetchedCategories() == 0 {
+            setupTitleAndImageIfNoContent(with: "Ничего не найдено", label: noContentLabel, imageView: noContentImageView, image: UIImage(named: Constants.noResultImage)!)
+        }
+        
+    }
+    
+    /// Сбрасывает поле поиска, убирает кнопку "Отменить"
     private func resetSearchField() {
         if view.subviews.contains(searchField) {
             searchCancelButton.removeFromSuperview()
@@ -86,93 +113,30 @@ final class TrackersViewController: UIViewController {
             setupSearchFieldFor(searchCancel: false)
             searchField.text = nil
         }
-        isCategoriesEmpty()
+        isNeedToSetupNoContentUI()
     }
     
+    /// Убирает no content UI
     private func removeNoContent() {
         noContentLabel.removeFromSuperview()
         noContentImageView.removeFromSuperview()
     }
-    
-    private func showTrackersForCurrentDate() {
-        visibleCategories.removeAll()
-        var categoriesForCurrentDate: [TrackerCategory] = []
-        let weekDay = currentDate.weekDay()
-        categories.forEach { category in
-            var rightTrackers: [Tracker] = []
-            category.trackers.forEach { [weak self] tracker in
-                guard let self = self else { return }
-                
-                if let daysOfTheWeek = tracker.daysOfTheWeek {
-                    daysOfTheWeek.forEach {
-                        $0.rawValue == weekDay ? rightTrackers.append(tracker) : nil
-                    }
-                } else {
-                    tracker.date.hasSame([.day, .month, .year], as: self.currentDate) ? rightTrackers.append(tracker) : nil
-                }
-            }
-            if rightTrackers.count != 0 {
-                let newCategory = TrackerCategory(title: category.title, trackers: rightTrackers)
-                categoriesForCurrentDate.append(newCategory)
-            }
-        }
-        
-        if categoriesForCurrentDate.count == 0 {
-            isCategoriesEmpty()
-        } else if categoriesForCurrentDate.count != 0 && view.subviews.contains(noContentLabel) {
-            removeNoContent()
-        }
-        visibleCategories = categoriesForCurrentDate
-        collectionView.reloadData()
-    }
-    
-    private func showSearchResultFor(_ text: String) {
-        var categoriesForCurrentSearch: [TrackerCategory] = []
-        categories.forEach { category in
-            var rightTrackers: [Tracker] = []
-            for tracker in category.trackers where tracker.name.contains(text) {
-                rightTrackers.append(tracker)
-            }
-            
-            if rightTrackers.count != 0 {
-                let newCategory = TrackerCategory(title: category.title, trackers: rightTrackers)
-                categoriesForCurrentSearch.append(newCategory)
-            }
-        }
-        
-        if categoriesForCurrentSearch.count == 0 {
-            setupTitleAndImageIfNoContent(with: "Ничего не найдено", label: noContentLabel, imageView: noContentImageView, image: .noResult)
-        } else if categoriesForCurrentSearch.count != 0 && view.subviews.contains(noContentLabel) {
-            removeNoContent()
-        }
-        collectionView.reloadData()
-        visibleCategories = categoriesForCurrentSearch
-    }
-    
-    func didReceiveCategories(categories: [TrackerCategory]) {
-        self.categories = categories
-        showTrackersForCurrentDate()
-        isCategoriesEmpty()
-        collectionView.reloadData()
-    }
 }
 
 // MARK: - TrackersCellDelegate
-
 extension TrackersViewController: TrackersCellDelegate {
-    func didRecieveNewRecord(_ completed: Bool, for id: UInt) {
+    func didRecieveNewRecord(_ completed: Bool, for id: UUID) {
+        let newRecord = TrackerRecord(id: id, date: currentDate)
         if completed {
             let newRecord = TrackerRecord(id: id, date: currentDate)
-            completedTrackers.append(newRecord)
-            completedTrackersIds.insert(id)
+            try? trackerRecordStore.addTrackerRecord(newRecord)
         } else {
-            completedTrackers.removeAll { $0.date.hasSame([.day, .month, .year], as: currentDate) }
+            try? trackerRecordStore.deleteTrackerRecord(newRecord, for: currentDate)
         }
     }
 }
 
 // MARK: - TextFieldDelegate
-
 extension TrackersViewController: UITextFieldDelegate {
     func textField(
         _ textField: UITextField,
@@ -192,7 +156,7 @@ extension TrackersViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         if searchField.text?.count == 0 {
-            isCategoriesEmpty()
+            isNeedToSetupNoContentUI()
         }
         return true
     }
@@ -204,17 +168,40 @@ extension TrackersViewController: UITextFieldDelegate {
     }
 }
 
-// MARK: - CollectionViewDataSource
-
-extension TrackersViewController: UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+// MARK: - HabitOrEventDelegate
+extension TrackersViewController: HabitOrEventDelegate {
+    func didRecieveTracker(_ tracker: Tracker, forCategoryTitle category: String) throws {
+        let newTrackerCategory = TrackerCategory(title: category, trackers: [tracker], createdAt: Date())
         
-        for number in 0..<visibleCategories.count {
-            if number == section {
-                return visibleCategories[number].trackers.count
+        let isTrackerExists = trackerStore.checkForExisting(tracker: tracker)
+        if isTrackerExists {
+            let existingTracker = try trackerStore.getCDTracker(tracker: tracker)
+            let existingCategory = try trackerCategoryStore.getCDTrackerCategoryFor(title: category)
+            trackerStore.updateExistingTracker(existingTracker, with: tracker, for: existingCategory)
+        } else {
+            let isCategoryExist = trackerCategoryStore.checkForExisting(categoryTitle: category)
+            if isCategoryExist {
+                try trackerStore.addNewTracker(tracker, forCategoryTitle: category)
+            } else {
+                trackerCategoryStore.addNewTrackerCategory(newTrackerCategory)
+                try trackerStore.addNewTracker(tracker, forCategoryTitle: category)
             }
         }
-        return 0
+        collectionView.reloadData()
+    }
+}
+
+// MARK: - TrackerStoreDelegate
+extension TrackersViewController: TrackerStoreDelegate {
+    func didUpdate() {
+        collectionView.reloadData()
+    }
+}
+
+// MARK: - CollectionViewDataSource
+extension TrackersViewController: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return trackerStore.numberOfRowsInSection(section)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -222,30 +209,22 @@ extension TrackersViewController: UICollectionViewDataSource {
             assertionFailure("No TrackerListCell")
             return UICollectionViewCell(frame: .zero)
         }
-        
-        let tracker = visibleCategories[indexPath.section].trackers[indexPath.row]
-        var isSameDate: Bool = false
-        var daysCount = 0
-        if completedTrackersIds.contains(tracker.id) {
-            let completedDays = completedTrackers.filter { $0.id == tracker.id }
-            let completedDaysCount = completedDays.count
-            daysCount = completedDaysCount
-            if completedDays.contains(where: { [weak self] in
-                guard let self = self else { return false }
-                return $0.date.hasSame([.day, .month, .year], as: self.currentDate)
-            }) {
-                isSameDate = true
-            }
+        /// Убеждаемся, что такой трекер есть. А если он есть, то можно использовать force unwrap для его свойств, так как они не опциональны
+        guard let tracker = trackerStore.object(at: indexPath) else {
+            return UICollectionViewCell(frame: .zero)
         }
+        
+        let isRecordExists = trackerRecordStore.isRecordExistsFor(trackerID: tracker.id!, and: currentDate)
+        let daysCount = trackerRecordStore.recordsCountFor(trackerID: tracker.id!)
         
         cell.configCell(
             delegate: self,
-            id: tracker.id,
-            color: tracker.color,
-            trackerName: tracker.name,
-            emoji: tracker.emoji,
+            id: tracker.id!,
+            color: uiColorMarshalling.color(from: tracker.colorHex!),
+            trackerName: tracker.name!,
+            emoji: tracker.emoji!,
             daysCount: daysCount,
-            isSameDate: isSameDate,
+            isRecordExists: isRecordExists,
             currentDate: currentDate)
         return cell
     }
@@ -265,17 +244,17 @@ extension TrackersViewController: UICollectionViewDataSource {
             assertionFailure("No SupplementaryView")
             return UICollectionReusableView(frame: .zero)
         }
-        view.titleLabel.text = categories[indexPath.section].title
+        let category = trackerStore.object(at: indexPath)?.category
+        view.titleLabel.text = category?.title
         return view
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return visibleCategories.count
+        return trackerStore.numberOfSections
     }
 }
 
 // MARK: - CollectionViewDelegateFlowLayout
-
 extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         CGSize(width: collectionView.bounds.width / 2 - 4.5, height: 132)
@@ -300,7 +279,6 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 }
 
 // MARK: - Views Setup
-
 extension TrackersViewController {
     private func setupHeaderLabel() {
         headerLabel.text = "Трекеры"

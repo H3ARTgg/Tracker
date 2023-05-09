@@ -6,10 +6,10 @@ protocol ScheduleCellDelegate: AnyObject {
 
 protocol ScheduleViewControllerProtocol: AnyObject {
     var delegate: ScheduleViewControllerDelegate? { get set }
-    func recieveDaysOfTheWeek(daysOfTheWeek: [Int: DaysOfTheWeek])
+    func recieveDaysOfTheWeek(daysOfTheWeek: [Int: WeekDay])
 }
 
 protocol ScheduleViewControllerDelegate: AnyObject {
-    func didRecieveDaysOfTheWeek(daysOfTheWeek: [Int: DaysOfTheWeek])
+    func didRecieveDaysOfTheWeek(daysOfTheWeek: [Int: WeekDay])
 }
 

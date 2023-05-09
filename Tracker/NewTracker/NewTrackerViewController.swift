@@ -5,9 +5,12 @@ enum Choice: String {
     case event = "Новое нерегулярное событие"
 }
 
+protocol NewTrackerDelegate: AnyObject {}
+
 final class NewTrackerViewController: UIViewController {
     private var habitButton = UIButton()
     private var eventButton = UIButton()
+    private weak var delegate: NewTrackerDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,16 +19,34 @@ final class NewTrackerViewController: UIViewController {
         setupTitleLabel(with: "Создание трекера")
     }
     
+    required init(delegate: NewTrackerDelegate) {
+        super.init(nibName: .none, bundle: .none)
+        self.delegate = delegate
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     @objc
     private func didTapHabitButton() {
-        let newHabitVC = HabitOrEventViewController(choice: .habit)
+        guard let habitOrEventDelegate = delegate as? HabitOrEventDelegate else {
+            assertionFailure("NewTrackerDelegate isn't a HabitOrEventDelegate")
+            return
+        }
+        let newHabitVC = HabitOrEventViewController(choice: .habit, delegate: habitOrEventDelegate)
         newHabitVC.modalPresentationStyle = .popover
         present(newHabitVC, animated: true)
     }
     
     @objc
     private func didTapEventButton() {
-        let newEventVC = HabitOrEventViewController(choice: .event)
+        guard let habitOrEventDelegate = delegate as? HabitOrEventDelegate else {
+            assertionFailure("NewTrackerDelegate isn't a HabitOrEventDelegate")
+            return
+        }
+
+        let newEventVC = HabitOrEventViewController(choice: .event, delegate: habitOrEventDelegate)
         newEventVC.modalPresentationStyle = .popover
         present(newEventVC, animated: true)
     }

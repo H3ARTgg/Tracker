@@ -2,8 +2,8 @@ import UIKit
 
 final class ScheduleCell: UITableViewCell {
     weak var delegate: ScheduleCellDelegate?
-    let title = UILabel()
-    let switcher = UISwitch()
+    private let title = UILabel()
+    private let switcher = UISwitch()
     private (set) var indexPath: IndexPath?
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -63,5 +63,13 @@ final class ScheduleCell: UITableViewCell {
         }
         indexPath = superview.indexPath(for: self)
         return indexPath
+    }
+    
+    public func setTitle(with text: String) {
+        self.title.text = text
+    }
+    
+    public func setOn(_ state: Bool) {
+        self.switcher.setOn(true, animated: false)
     }
 }
