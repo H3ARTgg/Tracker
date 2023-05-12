@@ -12,10 +12,10 @@ final class TrackerCategoryStore: NSObject {
             return
         }
         let context = appDelegate.persistentContainer.viewContext
-        try! self.init(context: context)
+        self.init(context: context)
     }
 
-    init(context: NSManagedObjectContext) throws {
+    init(context: NSManagedObjectContext) {
         self.context = context
         super.init()
     }

@@ -66,9 +66,7 @@ final class TrackersViewController: UIViewController, NewTrackerDelegate {
     @objc
     private func didDateChanged() {
         currentDate = datePicker.date
-        do {
-            try trackerStore.showTrackersByDayOfTheWeekFor(date: currentDate, searchText: searchText)
-        } catch {}
+        try? trackerStore.showTrackersByDayOfTheWeekFor(date: currentDate, searchText: searchText)
         collectionView.reloadData()
     }
     
@@ -99,7 +97,7 @@ final class TrackersViewController: UIViewController, NewTrackerDelegate {
             setupTitleAndImageIfNoContent(with: "Что будем отслеживать?", label: noContentLabel, imageView: noContentImageView, image: .noTrackers)
         }
         
-        if trackerStore.numberOfFetchedCategories() == 0 {
+        if trackerStore.numberOfFetchedCategories() == 0 && categories != nil {
             setupTitleAndImageIfNoContent(with: "Ничего не найдено", label: noContentLabel, imageView: noContentImageView, image: UIImage(named: Constants.noResultImage)!)
         }
         
@@ -225,7 +223,8 @@ extension TrackersViewController: UICollectionViewDataSource {
             emoji: tracker.emoji!,
             daysCount: daysCount,
             isRecordExists: isRecordExists,
-            currentDate: currentDate)
+            currentDate: currentDate,
+            indexPath: indexPath)
         return cell
     }
     
@@ -347,12 +346,13 @@ extension TrackersViewController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .ypWhite
         collectionView.isScrollEnabled = true
+        collectionView.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         view.addSubview(collectionView)
         
         NSLayoutConstraint.activate([
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            collectionView.topAnchor.constraint(equalTo: headerLabel.bottomAnchor, constant: 77),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
+            collectionView.topAnchor.constraint(equalTo: headerLabel.bottomAnchor, constant: 50),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
         collectionView.register(TrackersSupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "Header")

@@ -32,18 +32,6 @@ final class HabitOrEventViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
-//        guard let trackersVC = getTrackersViewController() as? TrackersViewController else {
-//            assertionFailure("No trackersVC")
-//            return
-//        }
-//
-//        self.trackersVC = trackersVC
-//
-//        for category in trackersVC.categories {
-//            stringCategories.append(category.title)
-//        }
-        
-//        categories = trackersVC.categories
         if let categories = delegate?.stringCategories {
             self.stringCategories = categories
         }
@@ -102,39 +90,6 @@ final class HabitOrEventViewController: UIViewController {
                 assertionFailure("can't try delegate method")
             }
             
-//            var newCategories: [TrackerCategory] = []
-//            for category in categories {
-//                var trackersArray: [Tracker] = []
-//                for tracker in category.trackers {
-//                    trackersArray.append(tracker)
-//                }
-//
-//                if category.title == stringCategories[selectedCategory.row] {
-//                    trackersArray.append(tracker)
-//                }
-//
-//                let newCategory = TrackerCategory(title: category.title, trackers: trackersArray, createdAt: Date())
-//                newCategories.append(newCategory)
-//            }
-//
-//            if !categories.contains(where: { $0.title == stringCategories[selectedCategory.row]}) {
-//                let newCategory = TrackerCategory(title: stringCategories[selectedCategory.row], trackers: [tracker], createdAt: Date())
-//
-//                newCategories.append(newCategory)
-//            }
-//
-//            if categories.count == 0 {
-//                let newCategory = TrackerCategory(
-//                    title: stringCategories[selectedCategory.row],
-//                    trackers: [tracker],
-//                    createdAt: Date()
-//                )
-//
-//                let newCategoriesFor: [TrackerCategory] = [newCategory]
-//                trackersVC?.didReceiveCategories(categories: newCategoriesFor)
-//            } else {
-//                trackersVC?.didReceiveCategories(categories: newCategories)
-//            }
             weak var presentingVC = self.presentingViewController
             dismiss(animated: true)
             presentingVC?.dismiss(animated: true)
