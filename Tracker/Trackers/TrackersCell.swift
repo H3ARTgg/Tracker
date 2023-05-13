@@ -6,17 +6,17 @@ final class TrackersCell: UICollectionViewCell {
     private let cardEmojiPlaceholder = UIView()
     private var daysButton = UIButton()
     private let cardView = UIView()
-    private (set) var indexPath: IndexPath?
-    var selectionColor: UIColor? {
+    private var indexPath: IndexPath = IndexPath(row: 0, section: 0)
+    private var selectionColor: UIColor? {
         didSet {
             daysButton.backgroundColor = selectionColor
             cardView.backgroundColor = selectionColor
         }
     }
-    let cardText = UILabel()
-    let cardEmoji = UILabel()
-    var delegate: TrackersCellDelegate?
-    var daysCounter: Int = 0 {
+    private let cardText = UILabel()
+    private let cardEmoji = UILabel()
+    private var delegate: TrackersCellDelegate?
+    private var daysCounter: Int = 0 {
         didSet {
             let lastInt = Int(String(String(daysCounter).last!))
             if let int = lastInt, daysCounter < 11 || daysCounter > 20 {
@@ -38,22 +38,7 @@ final class TrackersCell: UICollectionViewCell {
         }
     }
     private var willDoubleTap: Bool = false
-    var id: UInt = 0
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        setupCardView()
-        setupCardEmojiPlaceholder()
-        setupCardEmoji()
-        setupCardText()
-        setupDaysButton()
-        setupDaysLabel()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    private var id = UUID()
     
     @objc
     private func addDay() {
@@ -83,26 +68,41 @@ final class TrackersCell: UICollectionViewCell {
     
     func configCell(
         delegate: TrackersCellDelegate,
-        id: UInt,
+        id: UUID,
         color: UIColor,
         trackerName: String,
         emoji: String,
         daysCount: Int,
-        isSameDate: Bool,
-        currentDate: Date
+        isRecordExists: Bool,
+        currentDate: Date,
+        indexPath: IndexPath
     ) {
+        self.indexPath = indexPath
+        // Убрал из инициализации, так как констрейнты у меня настраиваются в зависимости от четности indexPath.row.
+        // Потому что если выставлять trailing и leading = 16 у collectionView, то скролл индикатор налазит на ячейки, в таком случае trailing и leading будут меняться у констрейнтов самой ячейки (но и тут была проблема, объяснено ниже)
+        self.subviews.forEach { view in
+            view.removeFromSuperview()
+        }
+        setupCardView()
+        setupCardEmojiPlaceholder()
+        setupCardEmoji()
+        setupCardText()
+        setupDaysButton()
+        setupDaysLabel()
+        
         self.id = id
         self.delegate = delegate
         self.selectionColor = color
         self.cardText.text = trackerName
         self.cardEmoji.text = emoji
         daysCounter = daysCount
-        isSameDate ? setDone() : setNotDone()
+        isRecordExists ? setDone() : setNotDone()
         if currentDate.isBiggerThanRealTime() {
             daysButton.isUserInteractionEnabled = false
         } else {
             daysButton.isUserInteractionEnabled = true
         }
+        
     }
 }
 
@@ -115,11 +115,26 @@ extension TrackersCell {
         cardView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(cardView)
         
-        NSLayoutConstraint.activate([
-            cardView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            cardView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            cardView.topAnchor.constraint(equalTo: topAnchor),
-        ])
+        // Данный способ помогает сохранить функциональность методов minimumInteritemSpacingForSectionAt и sizeForRowAt.
+        // Если же по умолчанию ставить всем ячейкам leading и trailing = 16, то размер ячейки увеличивается на 32 и создает большой отступ между ячейками.
+        if indexPath.row % 2 == 0 {
+            if let contraint = cardView.constraints.first(where: { constraint in
+                constraint.firstAnchor == cardView.leadingAnchor
+            }) {
+                contraint.isActive = false
+            }
+            NSLayoutConstraint.activate([
+                cardView.topAnchor.constraint(equalTo: topAnchor),
+                cardView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+                cardView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0)
+            ])
+        } else {
+            NSLayoutConstraint.activate([
+                cardView.topAnchor.constraint(equalTo: topAnchor),
+                cardView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0),
+                cardView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16)
+            ])
+        }
     }
     
     private func setupCardEmojiPlaceholder() {
@@ -176,7 +191,7 @@ extension TrackersCell {
         NSLayoutConstraint.activate([
             daysButton.widthAnchor.constraint(equalToConstant: 34),
             daysButton.heightAnchor.constraint(equalToConstant: 34),
-            daysButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
+            daysButton.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -12),
             daysButton.topAnchor.constraint(equalTo: cardView.bottomAnchor, constant: 8),
             daysButton.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
@@ -191,7 +206,7 @@ extension TrackersCell {
         addSubview(daysLabel)
         
         NSLayoutConstraint.activate([
-            daysLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
+            daysLabel.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 12),
             daysLabel.centerYAnchor.constraint(equalTo: daysButton.centerYAnchor),
             daysLabel.trailingAnchor.constraint(equalTo: daysButton.leadingAnchor, constant: 8)
         ])

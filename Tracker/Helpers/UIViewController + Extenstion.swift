@@ -1,19 +1,6 @@
 import UIKit
 
 extension UIViewController {
-    func getTrackersViewController() -> UIViewController {
-        if let presentingViewController = self.presentingViewController {
-            return presentingViewController.getTrackersViewController()
-        } else {
-            if let tabBar = self as? UITabBarController,
-                let navigation = tabBar.viewControllers?.first as? UINavigationController,
-                let viewController = navigation.viewControllers.first {
-                return viewController
-            }
-        }
-        return self
-    }
-    
     func setupTitleLabel(with text: String) {
         let label = UILabel()
         label.text = text
@@ -38,11 +25,10 @@ extension UIViewController {
         
         imageView.image = image
         
-        label.translatesAutoresizingMaskIntoConstraints = false
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        
-        view.addSubview(label)
-        view.addSubview(imageView)
+        [label, imageView].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview($0)
+        }
         
         NSLayoutConstraint.activate([
             imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),

@@ -102,7 +102,7 @@ extension HabitOrEventViewController {
         cancelButton.setImage(nil, for: .normal)
         cancelButton.setTitle("Отменить", for: .normal)
         cancelButton.setTitleColor(.ypRed, for: .normal)
-        cancelButton.backgroundColor = UIColor(red: 0/255, green: 0/255, blue: 0/255, alpha: 0)
+        cancelButton.backgroundColor = .ypAlphaWhite
         cancelButton.layer.borderWidth = 1
         cancelButton.layer.borderColor = CGColor(red: 245/255, green: 107/255, blue: 108/255, alpha: 1)
         cancelButton.makeCornerRadius(16)
