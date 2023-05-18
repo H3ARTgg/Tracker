@@ -1,7 +1,7 @@
 import UIKit
 
 protocol HabitOrEventDelegate: AnyObject {
-    var stringCategories: [String]? { get }
+    var stringCategories: [String] { get }
     func didRecieveTracker(_ tracker: Tracker, forCategoryTitle category: String) throws
 }
 
@@ -9,7 +9,6 @@ final class HabitOrEventViewController: UIViewController {
     private var trackersVC: TrackersViewController?
     private weak var delegate: HabitOrEventDelegate?
     private (set) var stringCategories: [String] = []
-    var categories: [TrackerCategory] = []
     private (set) var daysOfTheWeek: [Int: WeekDay] = [:]
     private (set) var choice: Choice!
     let emojiCellIdentifier = "emojiCell"
@@ -84,11 +83,7 @@ final class HabitOrEventViewController: UIViewController {
                 daysOfTheWeek: daysValues ?? nil,
                 createdAt: Date()
             )
-            do {
-                try delegate?.didRecieveTracker(tracker, forCategoryTitle: stringCategories[selectedCategory.row])
-            } catch {
-                assertionFailure("can't try delegate method")
-            }
+            try? delegate?.didRecieveTracker(tracker, forCategoryTitle: stringCategories[selectedCategory.row])
             
             weak var presentingVC = self.presentingViewController
             dismiss(animated: true)

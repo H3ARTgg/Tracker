@@ -4,61 +4,75 @@ import Foundation
 final class TrackersCell: UICollectionViewCell {
     private let daysLabel = UILabel()
     private let cardEmojiPlaceholder = UIView()
-    private var daysButton = UIButton()
     private let cardView = UIView()
-    private var indexPath: IndexPath = IndexPath(row: 0, section: 0)
+    private let cardText = UILabel()
+    private let cardEmoji = UILabel()
+    private var daysButton = UIButton()
+    private var willDoubleTap: Bool = false
+    private var id = UUID()
+    private var delegate: TrackersCellDelegate?
+    private var daysCount: Int = 0 {
+        didSet {
+            daysLabel.text = DaysOfTheWeek.getRightTextDeclinationFor(
+                recordCount: daysCount
+            )
+        }
+    }
     private var selectionColor: UIColor? {
         didSet {
             daysButton.backgroundColor = selectionColor
             cardView.backgroundColor = selectionColor
         }
     }
-    private let cardText = UILabel()
-    private let cardEmoji = UILabel()
-    private var delegate: TrackersCellDelegate?
-    private var daysCounter: Int = 0 {
+    var viewModel: TrackersCellViewModel! {
         didSet {
-            let lastInt = Int(String(String(daysCounter).last!))
-            if let int = lastInt, daysCounter < 11 || daysCounter > 20 {
-                switch int {
-                case 0:
-                    daysLabel.text? = "\(daysCounter) дней"
-                case 1:
-                    daysLabel.text? = "\(daysCounter) день"
-                case 2...4:
-                    daysLabel.text? = "\(daysCounter) дня"
-                case 5...9:
-                    daysLabel.text? = "\(daysCounter) дней"
-                default:
-                    daysLabel.text? = "\(daysCounter) дней"
-                }
+            self.subviews.forEach { view in
+                view.removeFromSuperview()
+            }
+            // В зависимости от номера ячейки меняются конcтрейнты
+            setupCardViewFor(cellNumber: viewModel.number)
+            setupCardEmojiPlaceholder()
+            setupCardEmoji()
+            setupCardText()
+            setupDaysButton()
+            setupDaysLabel()
+            
+            id = viewModel.id
+            delegate = viewModel.delegate
+            selectionColor = viewModel.color
+            cardText.text = viewModel.name
+            cardEmoji.text = viewModel.emoji
+            daysCount = viewModel.recordCount
+            viewModel.isRecordExists ? setDone() : setNotDone()
+            if viewModel.currentDate.isBiggerThanRealTime() {
+                daysButton.isUserInteractionEnabled = false
             } else {
-                daysLabel.text? = "\(daysCounter) дней"
+                daysButton.isUserInteractionEnabled = true
             }
         }
     }
-    private var willDoubleTap: Bool = false
-    private var id = UUID()
     
     @objc
     private func addDay() {
         if !willDoubleTap {
             setDone()
-            daysCounter += 1
+            daysCount += 1
             delegate?.didRecieveNewRecord(true, for: id)
         } else {
             setNotDone()
-            daysCounter -= 1
+            daysCount -= 1
             delegate?.didRecieveNewRecord(false, for: id)
         }
     }
     
+    /// Устанавливает состояние незавершенного трекера
     private func setNotDone() {
         daysButton.setImage(.plusForButton.imageResized(to: CGSize(width: 11, height: 11)), for: .normal)
         daysButton.layer.opacity = 1
         willDoubleTap = false
     }
     
+    /// Устанавливает состояние завершенного трекера
     private func setDone() {
         willDoubleTap = true
         daysButton.layer.opacity = 0.5
@@ -66,58 +80,30 @@ final class TrackersCell: UICollectionViewCell {
         daysButton.tintColor = .ypWhite
     }
     
-    func configCell(
-        delegate: TrackersCellDelegate,
-        id: UUID,
-        color: UIColor,
-        trackerName: String,
-        emoji: String,
-        daysCount: Int,
-        isRecordExists: Bool,
-        currentDate: Date,
-        indexPath: IndexPath
-    ) {
-        self.indexPath = indexPath
-        // Убрал из инициализации, так как констрейнты у меня настраиваются в зависимости от четности indexPath.row.
-        // Потому что если выставлять trailing и leading = 16 у collectionView, то скролл индикатор налазит на ячейки, в таком случае trailing и leading будут меняться у констрейнтов самой ячейки (но и тут была проблема, объяснено ниже)
-        self.subviews.forEach { view in
-            view.removeFromSuperview()
+    /// Получает текущий IndexPath ячейки
+    private func getCurrentIndexPath() -> IndexPath {
+        guard let superView = self.superview as? UICollectionView else {
+            //assertionFailure("superview is not a UICollectionView - getIndexPath")
+            return IndexPath(row: 0, section: 0)
         }
-        setupCardView()
-        setupCardEmojiPlaceholder()
-        setupCardEmoji()
-        setupCardText()
-        setupDaysButton()
-        setupDaysLabel()
-        
-        self.id = id
-        self.delegate = delegate
-        self.selectionColor = color
-        self.cardText.text = trackerName
-        self.cardEmoji.text = emoji
-        daysCounter = daysCount
-        isRecordExists ? setDone() : setNotDone()
-        if currentDate.isBiggerThanRealTime() {
-            daysButton.isUserInteractionEnabled = false
-        } else {
-            daysButton.isUserInteractionEnabled = true
-        }
-        
+        return superView.indexPath(for: self) ?? IndexPath(row: 0, section: 0)
     }
 }
 
 // MARK: - Views
-
 extension TrackersCell {
-    private func setupCardView() {
+    private func setupCardViewFor(cellNumber: Int) {
         cardView.makeCornerRadius(16)
         cardView.backgroundColor = selectionColor
         cardView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(cardView)
-        
-        // Данный способ помогает сохранить функциональность методов minimumInteritemSpacingForSectionAt и sizeForRowAt.
-        // Если же по умолчанию ставить всем ячейкам leading и trailing = 16, то размер ячейки увеличивается на 32 и создает большой отступ между ячейками.
-        if indexPath.row % 2 == 0 {
+        /*
+         Если выставлять trailing и leading = 16 у collectionView, то скролл индикатор налазит на ячейки, в таком случае нужно менять констрейнты trailing и leading у ячейки, но..
+         Если же по умолчанию ставить всем ячейкам leading и trailing = 16, то размер ячейки увеличивается на 32 и создает большой отступ между ячейками, что полностью убивает метод minimumInteritemSpacingForSectionAt.
+         Данный способ помогает сохранить функциональность методов minimumInteritemSpacingForSectionAt и sizeForRowAt.
+         Если есть иные решения, то буду рад узнать о них!
+         */
+        if cellNumber % 2 != 0 {
             if let contraint = cardView.constraints.first(where: { constraint in
                 constraint.firstAnchor == cardView.leadingAnchor
             }) {
@@ -172,8 +158,8 @@ extension TrackersCell {
         
         NSLayoutConstraint.activate([
             cardText.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 12),
-            cardText.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: 12),
-            cardText.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: 12),
+            cardText.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -12),
+            cardText.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -12),
             cardText.topAnchor.constraint(equalTo: cardEmojiPlaceholder.bottomAnchor, constant: 8)
         ])
     }

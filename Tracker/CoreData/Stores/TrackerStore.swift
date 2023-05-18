@@ -1,18 +1,12 @@
 import CoreData
 import UIKit
 
-// MARK: - Delegate Protocol
-protocol TrackerStoreDelegate: AnyObject {
-    func didUpdate()
-}
-
 // MARK: - TrackerStore
 final class TrackerStore: NSObject {
     private let uiColorMarshalling = UIColorMarshalling()
     private let trackerCategoryStore = TrackerCategoryStore()
     private let weekDayStore = WeekDayStore()
     private let context: NSManagedObjectContext
-    weak var delegate: TrackerStoreDelegate?
     private lazy var fetchedResultsController: NSFetchedResultsController<CDTracker> = {
         let fetchRequest = NSFetchRequest<CDTracker>(entityName: "CDTracker")
         fetchRequest.sortDescriptors = [
@@ -91,7 +85,7 @@ final class TrackerStore: NSObject {
     }
     
     /// Создает предикаты и выполняет FetchResultController запрос
-    func showTrackersByDayOfTheWeekFor(date: Date, searchText: String) throws {
+    func fetchTrackersByDayOfTheWeekFor(date: Date, searchText: String) throws {
         var predicates = [NSPredicate]()
         
         predicates.append(NSPredicate(
@@ -112,19 +106,20 @@ final class TrackerStore: NSObject {
         fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         
         try fetchedResultsController.performFetch()
-        
-        delegate?.didUpdate()
     }
 }
 
 // MARK: - NSFetchedResultsControllerDelegate
 extension TrackerStore: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        delegate?.didUpdate()
     }
 }
 
 extension TrackerStore {
+    var trackers: [CDTracker]? {
+        fetchedResultsController.fetchedObjects ?? []
+    }
+    
     /// Возвращает количество секций
     var numberOfSections: Int {
         fetchedResultsController.sections?.count ?? 0
@@ -139,13 +134,49 @@ extension TrackerStore {
     func object(at indexPath: IndexPath) -> CDTracker? {
         fetchedResultsController.object(at: indexPath)
     }
-
-    /// Возвращает количество полученных категорий
-    func numberOfFetchedCategories() -> Int {
+    
+    /// Возвращает массив CDTrackerCategory из Result Controller'а
+    func getFetchedCategories() -> [CDTrackerCategory] {
         var set: Set<CDTrackerCategory> = []
         fetchedResultsController.fetchedObjects?.forEach({
             set.insert($0.category!)
         })
-        return set.count
+        var array: [CDTrackerCategory] = []
+        set.forEach { array.append($0) }
+        return array
+    }
+    
+    
+//    func getTrackersCategories() -> [TrackerCategory] {
+//        var trackerCategories: [TrackerCategory] = []
+//        if let trackers = fetchedResultsController.fetchedObjects {
+//            let sections = getFetchedCategories()
+//            for section in sections {
+//                var sameCategoryTrackers: [Tracker] = []
+//                for tracker in trackers {
+//                    if tracker.category == section {
+//                        sameCategoryTrackers.append(Tracker(
+//                            id: tracker.id!,
+//                            name: tracker.name!,
+//                            color: uiColorMarshalling.color(from: tracker.colorHex!),
+//                            emoji: tracker.emoji!,
+//                            daysOfTheWeek: weekDayStore.convertFrom(nsSet: tracker.weekDays),
+//                            createdAt: tracker.createdAt!))
+//                    }
+//                }
+//                let trackerCategory = TrackerCategory(title: section.title!, trackers: sameCategoryTrackers, createdAt: section.createdAt!)
+//                trackerCategories.append(trackerCategory)
+//            }
+//            return trackerCategories
+//        }
+//        return []
+//    }
+    
+    func recreatePersistentContainer() {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            assertionFailure("no AppDelegate")
+            return
+        }
+        appDelegate.recreatePersistentContainer()
     }
 }

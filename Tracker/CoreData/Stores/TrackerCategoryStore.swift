@@ -41,12 +41,12 @@ final class TrackerCategoryStore: NSObject {
     }
     
     /// Возвращает заголовки всех трекер-категорий в модели
-    func getAllCategoriesTitles() throws -> [String] {
+    func getAllCategoriesTitles() -> [String] {
         let request = NSFetchRequest<CDTrackerCategory>(entityName: "CDTrackerCategory")
         request.propertiesToFetch = ["title"]
         var titleArray: [String] = []
-        let categoriesTitles = try context.fetch(request)
-        categoriesTitles.forEach {
+        let categoriesTitles = try? context.fetch(request)
+        categoriesTitles?.forEach {
             guard let title = $0.title else { return }
             titleArray.append(title)
         }

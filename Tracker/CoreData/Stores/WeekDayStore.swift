@@ -31,4 +31,17 @@ final class WeekDayStore {
         return NSSet(array: cdWeekDayArray)
     }
     
+    func convertFrom(nsSet: NSSet?) -> [WeekDay]? {
+        if let nsSet = nsSet {
+            var weekDays: [WeekDay] = []
+            nsSet.forEach { dayAny in
+                guard let cdWeekDay = dayAny as? CDWeekDay else { return }
+                let weekDay = WeekDay(weekDay: Int(cdWeekDay.weekDay))
+                weekDays.append(weekDay)
+            }
+            return weekDays
+        } else {
+            return nil
+        }
+    }
 }

@@ -26,5 +26,25 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         sceneConfiguration.delegateClass = SceneDelegate.self
         return sceneConfiguration
     }
+    
+    func recreatePersistentContainer() {
+        // Delete each existing persistent store
+        for store in persistentContainer.persistentStoreCoordinator.persistentStores {
+            try? persistentContainer.persistentStoreCoordinator.destroyPersistentStore(
+                at: store.url!,
+                ofType: store.type,
+                options: nil
+            )
+        }
+
+        // Re-create the persistent container
+        persistentContainer = NSPersistentContainer(
+            name: "Model"
+        )
+
+        // Calling loadPersistentStores will re-create the
+        // persistent stores
+        persistentContainer.loadPersistentStores { _,_  in }
+    }
 }
 
