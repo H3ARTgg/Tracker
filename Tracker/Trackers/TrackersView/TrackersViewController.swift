@@ -10,7 +10,7 @@ final class TrackersViewController: UIViewController {
     private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     private var searchText: String = ""
     private var currentDate: Date = Date()
-    private var viewModel: TrackersViewModel?
+    var viewModel: TrackersViewModel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,7 +22,6 @@ final class TrackersViewController: UIViewController {
         setupSearchFieldFor(searchCancel: false)
         setupCollectionView()
         
-        viewModel = TrackersViewModel(date: currentDate)
         viewModel?.$trackersCategories.bind(action: { [weak self] _ in
             self?.collectionView.reloadData()
             self?.isNeedToSetupNoContentUI()
@@ -152,7 +151,7 @@ extension TrackersViewController: UICollectionViewDataSource {
             return UICollectionViewCell(frame: .zero)
         }
         
-        cell.viewModel = viewModel?.trackersCategories[indexPath.section].trackers[indexPath.row]
+        viewModel?.configure(cell, for: indexPath)
         
         return cell
     }

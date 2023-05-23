@@ -7,17 +7,8 @@ final class TrackersCell: UICollectionViewCell {
     private let cardView = UIView()
     private let cardText = UILabel()
     private let cardEmoji = UILabel()
-    private var daysButton = UIButton()
+    private let daysButton = UIButton()
     private var willDoubleTap: Bool = false
-    private var id = UUID()
-    private var delegate: TrackersCellDelegate?
-    private var daysCount: Int = 0 {
-        didSet {
-            daysLabel.text = DaysOfTheWeek.getRightTextDeclinationFor(
-                recordCount: daysCount
-            )
-        }
-    }
     private var selectionColor: UIColor? {
         didSet {
             daysButton.backgroundColor = selectionColor
@@ -30,21 +21,23 @@ final class TrackersCell: UICollectionViewCell {
                 view.removeFromSuperview()
             }
             // В зависимости от номера ячейки меняются конcтрейнты
-            setupCardViewFor(cellNumber: viewModel.number)
+            setupCardViewFor(rowNumber: viewModel.rowNumber)
             setupCardEmojiPlaceholder()
             setupCardEmoji()
             setupCardText()
             setupDaysButton()
             setupDaysLabel()
             
-            id = viewModel.id
-            delegate = viewModel.delegate
+            viewModel.$daysRecordText.bind { [weak self] text in
+                self?.daysLabel.text = text
+            }
+            daysLabel.text = viewModel.daysRecordText
+            
             selectionColor = viewModel.color
             cardText.text = viewModel.name
             cardEmoji.text = viewModel.emoji
-            daysCount = viewModel.recordCount
             viewModel.isRecordExists ? setDone() : setNotDone()
-            if viewModel.currentDate.isBiggerThanRealTime() {
+            if viewModel.isDateBiggerThanRealTime() {
                 daysButton.isUserInteractionEnabled = false
             } else {
                 daysButton.isUserInteractionEnabled = true
@@ -56,12 +49,10 @@ final class TrackersCell: UICollectionViewCell {
     private func addDay() {
         if !willDoubleTap {
             setDone()
-            daysCount += 1
-            delegate?.didRecieveNewRecord(true, for: id)
+            viewModel.didAddDay(true)
         } else {
             setNotDone()
-            daysCount -= 1
-            delegate?.didRecieveNewRecord(false, for: id)
+            viewModel.didAddDay(false)
         }
     }
     
@@ -92,7 +83,7 @@ final class TrackersCell: UICollectionViewCell {
 
 // MARK: - Views
 extension TrackersCell {
-    private func setupCardViewFor(cellNumber: Int) {
+    private func setupCardViewFor(rowNumber: Int) {
         cardView.makeCornerRadius(16)
         cardView.backgroundColor = selectionColor
         cardView.translatesAutoresizingMaskIntoConstraints = false
@@ -103,7 +94,7 @@ extension TrackersCell {
          Данный способ помогает сохранить функциональность методов minimumInteritemSpacingForSectionAt и sizeForRowAt.
          Если есть иные решения, то буду рад узнать о них!
          */
-        if cellNumber % 2 != 0 {
+        if rowNumber % 2 != 0 {
             if let contraint = cardView.constraints.first(where: { constraint in
                 constraint.firstAnchor == cardView.leadingAnchor
             }) {
@@ -166,7 +157,8 @@ extension TrackersCell {
     
     private func setupDaysButton() {
         let plusImage = UIImage.plusForButton.imageResized(to: CGSize(width: 11, height: 11))
-        daysButton = UIButton.systemButton(with: plusImage, target: self, action: #selector(addDay))
+        daysButton.setImage(plusImage, for: .normal)
+        daysButton.addTarget(self, action: #selector(addDay), for: .touchUpInside)
         daysButton.tintColor = .ypWhite
         daysButton.translatesAutoresizingMaskIntoConstraints = false
         daysButton.backgroundColor = selectionColor ?? UIColor.white

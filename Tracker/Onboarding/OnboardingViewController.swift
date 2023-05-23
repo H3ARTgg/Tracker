@@ -1,12 +1,7 @@
 import UIKit
 
 final class OnboardingViewController: UIPageViewController {
-    private lazy var pages: [UIViewController] = {
-        let firstPage = FirstPageViewController()
-        let secondPage = SecondPageViewController()
-        
-        return [firstPage, secondPage]
-    }()
+    private lazy var pages: [Pages] = Pages.allCases
     
     private lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()
@@ -27,12 +22,12 @@ final class OnboardingViewController: UIPageViewController {
         setupButton()
         setupLayout()
         if let first = pages.first {
-            setViewControllers([first], direction: .forward, animated: true, completion: nil)
+            setViewControllers([PageSample(page: first)], direction: .forward, animated: true, completion: nil)
         }
     }
     
     @objc private func didTapButton() {
-        UserDefaults.standard.set(1, forKey: Constants.onboardCompleteKey)
+        Storage.addOnboardingCompletion()
         let tabBar = TabBarController(nibName: .none, bundle: .main)
         tabBar.modalPresentationStyle = .fullScreen
         tabBar.modalTransitionStyle = .crossDissolve
@@ -45,31 +40,39 @@ final class OnboardingViewController: UIPageViewController {
 // MARK: - PageDataSource
 extension OnboardingViewController: UIPageViewControllerDataSource {
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-        guard let viewControllerIndex = pages.firstIndex(of: viewController) else {
+        guard let pageSample = viewController as? PageSample else {
             return nil
         }
         
-        let previousIndex = viewControllerIndex - 1
-        
-        guard previousIndex >= 0 else {
-            return pages[pages.count - 1]
+        guard let pageIndex = pages.firstIndex(of: pageSample.page) else {
+            return nil
         }
         
-        return pages[previousIndex]
+        let previousIndex = pageIndex - 1
+        
+        guard previousIndex >= 0 else {
+            return PageSample(page: pages[pages.count - 1])
+        }
+        
+        return PageSample(page: pages[previousIndex])
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-        guard let viewControllerIndex = pages.firstIndex(of: viewController) else {
+        guard let pageSample = viewController as? PageSample else {
             return nil
         }
         
-        let nextIndex = viewControllerIndex + 1
-        
-        guard nextIndex < pages.count else {
-            return pages[pages.count - nextIndex]
+        guard let pageIndex = pages.firstIndex(of: pageSample.page) else {
+            return nil
         }
         
-        return pages[nextIndex]
+        let nextIndex = pageIndex + 1
+        
+        guard nextIndex < pages.count else {
+            return PageSample(page: pages[pages.count - nextIndex])
+        }
+        
+        return PageSample(page: pages[nextIndex])
     }
 }
 
@@ -77,7 +80,8 @@ extension OnboardingViewController: UIPageViewControllerDataSource {
 extension OnboardingViewController: UIPageViewControllerDelegate {
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         if let currentViewController = pageViewController.viewControllers?.first,
-           let currentIndex = pages.firstIndex(of: currentViewController) {
+           let pageSample = currentViewController as? PageSample,
+           let currentIndex = pages.firstIndex(of: pageSample.page) {
             pageControl.currentPage = currentIndex
         }
     }

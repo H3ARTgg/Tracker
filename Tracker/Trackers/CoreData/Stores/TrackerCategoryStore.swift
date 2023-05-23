@@ -1,8 +1,14 @@
 import CoreData
 import UIKit
 
-final class TrackerCategoryStore: NSObject {
-    private let uiColorMarshalling = UIColorMarshalling()
+protocol TrackerCategoryStoreProtocol: AnyObject {
+    func getCDTrackerCategoryFor(title : String) throws -> CDTrackerCategory
+    func checkForExisting(categoryTitle: String) -> Bool
+    func getAllCategoriesTitles() -> [String]
+    func addNewTrackerCategory(_ trakerCategory: TrackerCategory)
+}
+
+final class TrackerCategoryStore: NSObject, TrackerCategoryStoreProtocol {
     private let context: NSManagedObjectContext
     
     convenience override init() {
@@ -58,5 +64,6 @@ final class TrackerCategoryStore: NSObject {
         let cdCategory = CDTrackerCategory(context: context)
         cdCategory.createdAt = trakerCategory.createdAt
         cdCategory.title = trakerCategory.title
+        try? context.save()
     }
 }

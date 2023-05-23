@@ -2,7 +2,7 @@ import UIKit
 
 protocol HabitOrEventDelegate: AnyObject {
     var stringCategories: [String] { get }
-    func didRecieveTracker(_ tracker: Tracker, forCategoryTitle category: String) throws
+    func didRecieveTracker(_ tracker: Tracker, forCategoryIndex categoryIndex: Int, allCategories: [String]) throws
 }
 
 final class HabitOrEventViewController: UIViewController {
@@ -83,7 +83,7 @@ final class HabitOrEventViewController: UIViewController {
                 daysOfTheWeek: daysValues ?? nil,
                 createdAt: Date()
             )
-            try? delegate?.didRecieveTracker(tracker, forCategoryTitle: stringCategories[selectedCategory.row])
+            try? delegate?.didRecieveTracker(tracker, forCategoryIndex: selectedCategory.row, allCategories: stringCategories)
             
             weak var presentingVC = self.presentingViewController
             dismiss(animated: true)

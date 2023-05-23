@@ -24,9 +24,9 @@ final class CategoriesViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
+        setupNewCategoryButton()
         setupTableView()
         setupTitleLabel(with: "Категория")
-        setupNewCategoryButton()
     }
     
     @objc
@@ -41,8 +41,6 @@ final class CategoriesViewController: UIViewController {
         noContentImageView.removeFromSuperview()
         tableView.isHidden = false
 
-        tableView.removeFromSuperview()
-        setupTableView()
         tableView.reloadData()
     }
     
@@ -55,8 +53,7 @@ final class CategoriesViewController: UIViewController {
         }
         self.stringCategories.append(category)
         reloadCurrentCheckmarkForLastCreatedCategory()
-        tableView.removeFromSuperview()
-        setupTableView()
+
         tableView.reloadData()
     }
     
@@ -104,6 +101,10 @@ extension CategoriesViewController: UITableViewDataSource {
         }
         
         cell.title.text = stringCategories[indexPath.row]
+        
+        if indexPath.row == stringCategories.count - 1 {
+            cell.contentView.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMinXMaxYCorner]
+        }
         
         return cell
     }
@@ -159,21 +160,11 @@ extension CategoriesViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
         
-        if stringCategories.count > 0 {
-            var amount = 0
-            for _ in 0..<stringCategories.count {
-                amount += 74
-            }
-            tableView.constraints.first { constraint in
-                constraint.firstAnchor == tableView.heightAnchor
-            }?.isActive = false
-            tableView.heightAnchor.constraint(equalToConstant: CGFloat(amount)).isActive = true
-        }
-        
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: 65),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            tableView.bottomAnchor.constraint(equalTo: newCategoryButton.topAnchor, constant: -20)
         ])
     }
 }

@@ -1,21 +1,27 @@
 import UIKit
 
-final class FirstPageViewController: UIViewController {
+final class PageSample: UIViewController {
     private let imageView = UIImageView()
     private let label = UILabel()
-    private var button = UIButton()
+    private(set) var page: Pages
     
     override func viewDidLoad() {
         setupImageView()
         setupLabel()
     }
     
+    init(page: Pages) {
+        self.page = page
+        super.init(nibName: .none, bundle: .main)
+        self.label.text = page.rawValue
+        self.imageView.image = page.getImage()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     private func setupImageView() {
-        if let image = UIImage(named: Constants.firstPageBG) {
-            imageView.image = image
-        } else {
-            assertionFailure("no image")
-        }
         imageView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(imageView)
         
@@ -29,7 +35,6 @@ final class FirstPageViewController: UIViewController {
     
     private func setupLabel() {
         label.font = .systemFont(ofSize: 32, weight: .bold)
-        label.text = "Отслеживайте только то, что хотите"
         label.numberOfLines = 2
         label.textColor = .onlyBlack
         label.textAlignment = .center

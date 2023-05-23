@@ -5,7 +5,9 @@ final class TabBarController: UITabBarController {
         super.viewDidLoad()
         UITabBar.appearance().backgroundColor = .ypWhite
         ///Controllers
+        let trackerViewModel = TrackersViewModel(date: Date(), trackerCategoryStore: TrackerCategoryStore())
         let trackerListVC = TrackersViewController()
+        trackerListVC.viewModel = trackerViewModel
         let statisticVC = StatisticViewController()
         let navigationVC = UINavigationController(rootViewController: trackerListVC)
         ///Images

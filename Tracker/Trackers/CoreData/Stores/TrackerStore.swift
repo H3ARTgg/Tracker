@@ -3,8 +3,7 @@ import UIKit
 
 // MARK: - TrackerStore
 final class TrackerStore: NSObject {
-    private let uiColorMarshalling = UIColorMarshalling()
-    private let trackerCategoryStore = TrackerCategoryStore()
+    private let trackerCategoryStore: TrackerCategoryStoreProtocol!
     private let weekDayStore = WeekDayStore()
     private let context: NSManagedObjectContext
     private lazy var fetchedResultsController: NSFetchedResultsController<CDTracker> = {
@@ -27,20 +26,21 @@ final class TrackerStore: NSObject {
         return fetchedResultsController
     }()
 
-    convenience override init() {
+    convenience init(trackerCategoryStore: TrackerCategoryStoreProtocol) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             assertionFailure("no AppDelegate")
-            self.init()
+            self.init(trackerCategoryStore: trackerCategoryStore)
             return
         }
         let context = appDelegate.persistentContainer.viewContext
-        try! self.init(context: context)
+        try! self.init(context: context, trackerCategoryStore: trackerCategoryStore)
     }
 
-    init(context: NSManagedObjectContext) throws {
+    init(context: NSManagedObjectContext, trackerCategoryStore: TrackerCategoryStoreProtocol) throws {
         self.context = context
-        super.init()
+        self.trackerCategoryStore = trackerCategoryStore
     }
+    
     
     /// Добовляет новый трекер в модель
     func addNewTracker(_ tracker: Tracker, forCategoryTitle category: String) throws {
@@ -56,7 +56,7 @@ final class TrackerStore: NSObject {
             let cdWeekDaysSet = weekDayStore.saveWeekDays(weekDays: weekDays, with: cdTracker)
             cdTracker.weekDays = cdWeekDaysSet
         }
-        cdTracker.colorHex = uiColorMarshalling.hexString(from: tracker.color)
+        cdTracker.colorHex = ColorMarshalling.hexString(from: tracker.color)
         cdTracker.createdAt = tracker.createdAt
         cdTracker.id = tracker.id
         cdTracker.emoji = tracker.emoji
@@ -145,32 +145,6 @@ extension TrackerStore {
         set.forEach { array.append($0) }
         return array
     }
-    
-    
-//    func getTrackersCategories() -> [TrackerCategory] {
-//        var trackerCategories: [TrackerCategory] = []
-//        if let trackers = fetchedResultsController.fetchedObjects {
-//            let sections = getFetchedCategories()
-//            for section in sections {
-//                var sameCategoryTrackers: [Tracker] = []
-//                for tracker in trackers {
-//                    if tracker.category == section {
-//                        sameCategoryTrackers.append(Tracker(
-//                            id: tracker.id!,
-//                            name: tracker.name!,
-//                            color: uiColorMarshalling.color(from: tracker.colorHex!),
-//                            emoji: tracker.emoji!,
-//                            daysOfTheWeek: weekDayStore.convertFrom(nsSet: tracker.weekDays),
-//                            createdAt: tracker.createdAt!))
-//                    }
-//                }
-//                let trackerCategory = TrackerCategory(title: section.title!, trackers: sameCategoryTrackers, createdAt: section.createdAt!)
-//                trackerCategories.append(trackerCategory)
-//            }
-//            return trackerCategories
-//        }
-//        return []
-//    }
     
     func recreatePersistentContainer() {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {

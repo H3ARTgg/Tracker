@@ -15,7 +15,7 @@ final class HabitOrEventColorCell: UICollectionViewCell {
     }
     
     private func setupColorView() {
-        colorView.makeCornerRadius(8)
+        colorView.makeCornerRadius(11)
         colorView.translatesAutoresizingMaskIntoConstraints = false
         
         contentView.addSubview(colorView)
@@ -35,10 +35,10 @@ final class HabitOrEventColorCell: UICollectionViewCell {
         contentView.addSubview(border)
         
         NSLayoutConstraint.activate([
-            border.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            border.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            border.topAnchor.constraint(equalTo: contentView.topAnchor),
-            border.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+            border.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 1),
+            border.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -1),
+            border.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 1),
+            border.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -1)
         ])
     }
     

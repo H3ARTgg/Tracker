@@ -10,5 +10,4 @@ struct Constants {
     static let selectBorder = "select_border"
     static let firstPageBG = "firstPageBG"
     static let secondPageBG = "secondPageBG"
-    static let onboardCompleteKey = "onboardComplete"
 }
