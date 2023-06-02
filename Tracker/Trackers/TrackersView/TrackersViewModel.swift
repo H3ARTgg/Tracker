@@ -1,19 +1,20 @@
 import UIKit
 
-// Вот такая реализация. Не стал, пока что, делать все под MVVM, так как хочу увидеть фидбек по данной реализации, а затем уже, исправляя ошибки, переделывать все под MVVM.
 final class TrackersViewModel: NewTrackerDelegate {
     private var currentDate: Date
     private let trackerCategoryStore: TrackerCategoryStoreProtocol!
-    private let trackerStore: TrackerStore
-    private let trackerRecordStore = TrackerRecordStore()
-    private let weekDayStore = WeekDayStore()
+    private let trackerStore: TrackerStoreProtocol!
+    private let trackerRecordStore: TrackerRecordStoreProtocol!
+    private let weekDayStore: WeekDayStoreProtocol!
     private(set) var stringCategories: [String] = []
     @Observable private(set) var trackersCategories: [TrackersSupplementaryViewModel] = []
     
-    init(date: Date, trackerCategoryStore: TrackerCategoryStoreProtocol) {
+    init(date: Date, trackerCategoryStore: TrackerCategoryStoreProtocol, trackerStore: TrackerStoreProtocol, trackerRecordStore: TrackerRecordStoreProtocol, weekDayStore: WeekDayStoreProtocol) {
         self.currentDate = date
         self.trackerCategoryStore = trackerCategoryStore
-        self.trackerStore = TrackerStore(trackerCategoryStore: trackerCategoryStore)
+        self.trackerStore = trackerStore
+        self.trackerRecordStore = trackerRecordStore
+        self.weekDayStore = weekDayStore
         showTrackersFor(date: currentDate, search: "")
     }
     
@@ -33,20 +34,19 @@ final class TrackersViewModel: NewTrackerDelegate {
                     )
                 let recordCount = trackerRecordStore
                     .recordsCountFor(trackerID: tracker.id ?? UUID())
+                let trackersCellViewModelSample = TrackersCellViewModelSample(
+                    id: tracker.id ?? UUID(),
+                    color: ColorMarshalling.color(from: tracker.colorHex ?? ""),
+                    name: tracker.name ?? "",
+                    emoji: tracker.emoji ?? "",
+                    recordCount: recordCount,
+                    isRecordExists: isRecordExists,
+                    currentDate: currentDate,
+                    delegate: self,
+                    rowNumber: rowNumber
+                )
                 sameCategoryTrackers.append(
-                    TrackersCellViewModel(
-                        id: tracker.id ?? UUID(),
-                        color:
-                            ColorMarshalling
-                            .color(from: tracker.colorHex ?? ""),
-                        name: tracker.name ?? "",
-                        emoji: tracker.emoji ?? "",
-                        recordCount: recordCount,
-                        isRecordExists: isRecordExists,
-                        currentDate: currentDate,
-                        delegate: self,
-                        rowNumber: rowNumber
-                    )
+                    TrackersCellViewModel(cellSample: trackersCellViewModelSample)
                 )
             }
         }
@@ -82,6 +82,11 @@ final class TrackersViewModel: NewTrackerDelegate {
     func configure(_ cell: TrackersCell, for indexPath: IndexPath) {
         cell.viewModel = trackersCategories[indexPath.section].trackers[indexPath.row]
     }
+    
+    /// Возвращает ViewModel для NewTrackerViewController
+    func getViewModelForNewTracker() -> NewTrackerViewModel {
+        NewTrackerViewModel(delegate: self)
+    }
 }
 
 // MARK: - TrackersCellDelegate
@@ -99,30 +104,32 @@ extension TrackersViewModel: TrackersCellDelegate {
 
 // MARK: - HabitOrEventDelegate
 extension TrackersViewModel: HabitOrEventDelegate {
-    func didRecieveTracker(_ tracker: Tracker, forCategoryIndex categoryIndex: Int, allCategories: [String]) throws {
-        let newTrackerCategory = TrackerCategory(title: allCategories[categoryIndex], trackers: [tracker], createdAt: Date())
+    func didRecieveTracker(_ tracker: Tracker, category: String, allCategories: [String]) throws {
+        let newTrackerCategory = TrackerCategory(title: category, trackers: [tracker], createdAt: Date())
         
         let isTrackerExists = trackerStore.checkForExisting(tracker: tracker)
         
         if isTrackerExists {
             let existingTracker = try trackerStore.getCDTracker(tracker: tracker)
-            let existingCategory = try trackerCategoryStore.getCDTrackerCategoryFor(title: allCategories[categoryIndex])
+            let existingCategory = try trackerCategoryStore.getCDTrackerCategoryFor(title: category)
             trackerStore.updateExistingTracker(existingTracker, with: tracker, for: existingCategory)
         } else {
-            let isCategoryExist = trackerCategoryStore.checkForExisting(categoryTitle: allCategories[categoryIndex])
+            let isCategoryExist = trackerCategoryStore.checkForExisting(categoryTitle: category)
             
             if isCategoryExist {
-                try trackerStore.addNewTracker(tracker, forCategoryTitle: allCategories[categoryIndex])
+                try trackerStore.addNewTracker(tracker, forCategoryTitle: category)
             } else {
                 trackerCategoryStore.addNewTrackerCategory(newTrackerCategory)
-                try trackerStore.addNewTracker(tracker, forCategoryTitle: allCategories[categoryIndex])
+                try trackerStore.addNewTracker(tracker, forCategoryTitle: category)
             }
         }
         
-        let categoriesWithoutSelected = allCategories.filter { $0 != allCategories[categoryIndex] }
+        let categoriesWithoutSelected = allCategories.filter { $0 != category }
         for category in categoriesWithoutSelected {
-            let trackerCategory = TrackerCategory(title: category, trackers: [], createdAt: Date())
-            trackerCategoryStore.addNewTrackerCategory(trackerCategory)
+            if !trackerCategoryStore.checkForExisting(categoryTitle: category) {
+                let trackerCategory = TrackerCategory(title: category, trackers: [], createdAt: Date())
+                trackerCategoryStore.addNewTrackerCategory(trackerCategory)
+            }
         }
         showTrackersFor(date: currentDate, search: "")
     }

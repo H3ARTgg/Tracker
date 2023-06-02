@@ -32,7 +32,7 @@ extension HabitOrEventViewController {
         
         contentView.addSubview(tableView)
         
-        switch choice {
+        switch viewModel?.choice {
         case .habit:
             tableView.heightAnchor.constraint(equalToConstant: 148).isActive = true
         case .event:

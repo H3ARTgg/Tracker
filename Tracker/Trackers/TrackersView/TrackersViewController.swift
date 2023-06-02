@@ -47,7 +47,8 @@ final class TrackersViewController: UIViewController {
     @objc
     private func addNewTracker() {
         resetSearchField()
-        let newTrackerVC = NewTrackerViewController(delegate: viewModel!)
+        let newTrackerVC = NewTrackerViewController()
+        newTrackerVC.viewModel = viewModel?.getViewModelForNewTracker()
         newTrackerVC.modalPresentationStyle = .popover
         present(newTrackerVC, animated: true)
     }

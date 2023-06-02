@@ -41,9 +41,8 @@ extension HabitOrEventViewController: UICollectionViewDelegateFlowLayout {
                 assertionFailure("No cell for indexPath: \(indexPath)")
                 return
             }
-            checkForSelectedEmoji()
+            viewModel?.selectEmoji(at: indexPath)
             cell.selectEmoji()
-            selectedEmoji = indexPath
             isReadyForCreate()
         }
         else {
@@ -51,30 +50,9 @@ extension HabitOrEventViewController: UICollectionViewDelegateFlowLayout {
                 assertionFailure("No cell for indexPath: \(indexPath)")
                 return
             }
-            checkForSelectedColor()
+            viewModel?.selectColor(at: indexPath)
             cell.selectColor()
-            selectedColor = indexPath
             isReadyForCreate()
-        }
-    }
-    
-    private func checkForSelectedColor() {
-        if let selectedColor = selectedColor {
-            guard let selectedCell = collectionView.cellForItem(at: selectedColor) as? HabitOrEventColorCell else {
-                assertionFailure("No cell for selected indexPath: \(selectedColor)")
-                return
-            }
-            selectedCell.deselectColor()
-        }
-    }
-    
-    private func checkForSelectedEmoji() {
-        if let selectedEmoji = selectedEmoji {
-            guard let selectedCell = collectionView.cellForItem(at: selectedEmoji) as? HabitOrEventEmojiCell else {
-                assertionFailure("No cell for selected indexPath: \(selectedEmoji)")
-                return
-            }
-            selectedCell.deselectEmoji()
         }
     }
 }

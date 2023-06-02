@@ -1,5 +1,6 @@
 import UIKit
 
+// TODO: Переделать под MVVM
 final class ScheduleViewController: UIViewController {
     private let cellIdentifier = "scheduleCell"
     private let tableView = UITableView()
@@ -17,6 +18,13 @@ final class ScheduleViewController: UIViewController {
         setupTitleLabel(with: "Расписание")
         setupTableView()
         setupDoneButton()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        weak var habitOrEventVC = presentingViewController as? HabitOrEventViewController
+        habitOrEventVC?.tableView.deselectRow(at: IndexPath(row: 1, section: 0), animated: true)
     }
     
     @objc

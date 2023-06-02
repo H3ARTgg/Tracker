@@ -12,4 +12,22 @@ enum Pages: String, CaseIterable {
             return UIImage(named: Constants.secondPageBG) ?? UIImage()
         }
     }
+    
+    func next() -> Pages {
+        switch self {
+        case .first:
+            return Pages.second
+        case .second:
+            return Pages.first
+        }
+    }
+    
+    func previous() -> Pages {
+        switch self {
+        case .first:
+            return Pages.second
+        case .second:
+            return Pages.first
+        }
+    }
 }

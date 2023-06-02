@@ -15,9 +15,8 @@ extension HabitOrEventViewController: UITableViewDelegate {
     
     private func showCategoriesViewController() {
         let categoriesVC = CategoriesViewController()
+        categoriesVC.viewModel = viewModel?.getViewModelForCategories()
         categoriesVC.modalPresentationStyle = .popover
-        categoriesVC.delegate = self
-        categoriesVC.recieveCategories(categories: self.stringCategories, currentAt: self.selectedCategory)
         textField.resignFirstResponder()
         present(categoriesVC, animated: true)
     }
@@ -25,8 +24,8 @@ extension HabitOrEventViewController: UITableViewDelegate {
     private func showScheduleViewController() {
         let scheduleVC = ScheduleViewController()
         scheduleVC.modalPresentationStyle = .popover
-        scheduleVC.delegate = self
-        scheduleVC.recieveDaysOfTheWeek(daysOfTheWeek: self.daysOfTheWeek)
+        scheduleVC.delegate = viewModel
+        scheduleVC.recieveDaysOfTheWeek(daysOfTheWeek: viewModel?.daysOfTheWeek ?? [0 : WeekDay(weekDay: 0)])
         textField.resignFirstResponder()
         present(scheduleVC, animated: true)
     }

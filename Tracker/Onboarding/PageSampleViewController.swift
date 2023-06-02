@@ -1,6 +1,6 @@
 import UIKit
 
-final class PageSample: UIViewController {
+final class PageSampleViewController: UIViewController {
     private let imageView = UIImageView()
     private let label = UILabel()
     private(set) var page: Pages

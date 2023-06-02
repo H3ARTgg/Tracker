@@ -1,8 +1,26 @@
 import CoreData
 import UIKit
 
+protocol TrackerStoreProtocol: AnyObject {
+    /// Добовляет новый трекер в модель
+    func addNewTracker(_ tracker: Tracker, forCategoryTitle category: String) throws
+    /// Обновляет существующий CDTracker(entity)
+    func updateExistingTracker(_ cdTracker: CDTracker, with tracker: Tracker, for category: CDTrackerCategory)
+    /// Проверяет, есть ли данный трекер в модели
+    func checkForExisting(tracker: Tracker) -> Bool
+    /// Возвращает CDTracker(entity) по Tracker
+    func getCDTracker(tracker: Tracker) throws -> CDTracker
+    /// Создает предикаты и выполняет FetchResultController запрос
+    func fetchTrackersByDayOfTheWeekFor(date: Date, searchText: String) throws
+    /// Количество трекеров в result controller'е
+    var trackers: [CDTracker]? { get }
+    /// Возвращает массив CDTrackerCategory из Result Controller'а
+    func getFetchedCategories() -> [CDTrackerCategory]
+    func recreatePersistentContainer()
+}
+
 // MARK: - TrackerStore
-final class TrackerStore: NSObject {
+final class TrackerStore: NSObject, TrackerStoreProtocol {
     private let trackerCategoryStore: TrackerCategoryStoreProtocol!
     private let weekDayStore = WeekDayStore()
     private let context: NSManagedObjectContext
@@ -116,23 +134,9 @@ extension TrackerStore: NSFetchedResultsControllerDelegate {
 }
 
 extension TrackerStore {
+    /// Количество трекеров в result controller'е
     var trackers: [CDTracker]? {
         fetchedResultsController.fetchedObjects ?? []
-    }
-    
-    /// Возвращает количество секций
-    var numberOfSections: Int {
-        fetchedResultsController.sections?.count ?? 0
-    }
-    
-    /// Возвращает количество ячеек в секции
-    func numberOfRowsInSection(_ section: Int) -> Int {
-        fetchedResultsController.sections?[section].numberOfObjects ?? 0
-    }
-    
-    /// Возвращает CDTracker для конкретного IndexPath
-    func object(at indexPath: IndexPath) -> CDTracker? {
-        fetchedResultsController.object(at: indexPath)
     }
     
     /// Возвращает массив CDTrackerCategory из Result Controller'а

@@ -1,6 +1,18 @@
 import Foundation
 import UIKit
 
+struct TrackersCellViewModelSample {
+    let id: UUID
+    let color: UIColor
+    let name: String
+    let emoji: String
+    let recordCount: Int
+    let isRecordExists: Bool
+    let currentDate: Date
+    let delegate: TrackersCellDelegate
+    let rowNumber: Int
+}
+
 final class TrackersCellViewModel: Identifiable {
     private let delegate: TrackersCellDelegate
     private let currentDate: Date
@@ -18,24 +30,16 @@ final class TrackersCellViewModel: Identifiable {
     }
     @Observable private(set) var daysRecordText: String = "0 дней"
     
-    init(id: UUID,
-         color: UIColor,
-         name: String,
-         emoji: String,
-         recordCount: Int,
-         isRecordExists: Bool,
-         currentDate: Date,
-         delegate: TrackersCellDelegate,
-         rowNumber: Int) {
-        self.id = id
-        self.color = color
-        self.name = name
-        self.emoji = emoji
-        self.recordCount = recordCount
-        self.isRecordExists = isRecordExists
-        self.currentDate = currentDate
-        self.delegate = delegate
-        self.rowNumber = rowNumber
+    init(cellSample: TrackersCellViewModelSample) {
+        self.id = cellSample.id
+        self.color = cellSample.color
+        self.name = cellSample.name
+        self.emoji = cellSample.emoji
+        self.recordCount = cellSample.recordCount
+        self.isRecordExists = cellSample.isRecordExists
+        self.currentDate = cellSample.currentDate
+        self.delegate = cellSample.delegate
+        self.rowNumber = cellSample.rowNumber
         self.daysRecordText = DaysOfTheWeek.getRightTextDeclinationFor(recordCount: recordCount)
     }
     

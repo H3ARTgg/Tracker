@@ -9,9 +9,10 @@ extension UIImage {
     static let plusForButton = UIImage(named: Constants.plusBarItem)!
     static let doneCheckmark = UIImage(named: "done_checkmark")!
     
-    func imageResized(to size: CGSize) -> UIImage {
-        return UIGraphicsImageRenderer(size: size).image { _ in
+    func imageResized(to size: CGSize, color: UIColor? = .ypWhite) -> UIImage {
+        let image = UIGraphicsImageRenderer(size: size).image { _ in
             draw(in: CGRect(origin: .zero, size: size))
         }
+        return image.withTintColor(color ?? .white, renderingMode: .automatic)
     }
 }

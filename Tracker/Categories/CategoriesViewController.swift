@@ -6,14 +6,20 @@ final class CategoriesViewController: UIViewController {
     private let noContentImageView = UIImageView()
     private let tableView = UITableView()
     private var newCategoryButton = UIButton()
-    private var lastAmount: CGFloat!
-    private var stringCategories: [String] = []
-    private var selectedCategory: IndexPath?
-    weak var delegate: CategoriesViewControllerDelegate?
+//    private var lastAmount: CGFloat!
+//    private var stringCategories: [String] = []
+//    private var selectedCategory: IndexPath?
+    var viewModel: CategoriesViewModel?
+    //weak var delegate: CategoriesDelegate?
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if stringCategories.isEmpty {
+        guard let viewModel = viewModel else {
+            assertionFailure("no viewModel")
+            return
+        }
+        
+        if viewModel.stringCategories.isEmpty {
             setupTitleAndImageIfNoContent(with: "Привычки и события можно объединить по смыслу", label: noContentLabel, imageView: noContentImageView, image: .noTrackers)
             tableView.isHidden = true
         } else {
@@ -27,65 +33,96 @@ final class CategoriesViewController: UIViewController {
         setupNewCategoryButton()
         setupTableView()
         setupTitleLabel(with: "Категория")
+        
+        viewModel?
+            .$stringCategories.bind(action: { [weak self] _ in
+                self?.removeNoContentViews()
+                self?.tableView.reloadData()
+        })
+        
+        viewModel?
+            .$previousSelectedCategory.bind(action: { [weak self] indexPath in
+                guard let cell = self?.tableView
+                    .cellForRow(at: indexPath) as? CategoriesCell else {
+                    return
+                }
+                cell.removeCheckmark()
+        })
+        
+        viewModel?
+            .$selectedCategory.bind(action: { [weak self] indexPath in
+                guard let indexPath = indexPath else { return }
+            guard let cell = self?.tableView
+                .cellForRow(at: indexPath) as? CategoriesCell else {
+                return
+            }
+            cell.setupCheckmark()
+        })
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        weak var habitOrEventVC = presentingViewController as? HabitOrEventViewController
+        habitOrEventVC?.tableView.deselectRow(at: IndexPath(row: 0, section: 0), animated: true)
     }
     
     @objc
     private func didTapNewCategoryButton() {
         let newCategoryVC = NewCategoryViewController()
+        newCategoryVC.viewModel = viewModel?.getViewModelForNewCategory()
         newCategoryVC.modalPresentationStyle = .popover
         present(newCategoryVC, animated: true)
     }
     
     private func removeNoContentViews() {
-        noContentLabel.removeFromSuperview()
-        noContentImageView.removeFromSuperview()
-        tableView.isHidden = false
-
-        tableView.reloadData()
+        if view
+            .subviews
+            .contains(where: { $0 == noContentLabel }) {
+            noContentLabel.removeFromSuperview()
+            noContentImageView.removeFromSuperview()
+            tableView.isHidden = false
+        }
     }
     
-    func addNewCategory(category: String) {
-        if stringCategories.isEmpty {
-            removeNoContentViews()
-        }
-        if stringCategories.contains(category) {
-            return
-        }
-        self.stringCategories.append(category)
-        reloadCurrentCheckmarkForLastCreatedCategory()
-
-        tableView.reloadData()
-    }
+//    func addNewCategory(category: String) {
+//        if stringCategories.isEmpty {
+//            removeNoContentViews()
+//        }
+//        if stringCategories.contains(category) {
+//            return
+//        }
+//        self.stringCategories.append(category)
+//        reloadCurrentCheckmarkForLastCreatedCategory()
+//
+//        tableView.reloadData()
+//    }
     
-    private func reloadCurrentCheckmarkForLastCreatedCategory() {
-        if let selectedCategory = selectedCategory {
-            guard let cell = tableView.cellForRow(at: selectedCategory) as? CategoriesCell else {
-                assertionFailure("No cell for that IndexPath: \(selectedCategory)")
-                return
-            }
-            cell.removeCheckmark()
-        }
-        let lastCreatedCategory = IndexPath(row: stringCategories.count - 1, section: 0)
-        self.selectedCategory = lastCreatedCategory
-    }
+//    private func resetCurrentCheckmarkForLastCreatedCategory() {
+//            guard let cell = tableView.cellForRow(at: selectedCategory) as? CategoriesCell else {
+//                assertionFailure("No cell for that IndexPath: \(selectedCategory)")
+//                return
+//            }
+//            cell.removeCheckmark()
+//        let lastCreatedCategory = IndexPath(row: stringCategories.count - 1, section: 0)
+//        self.selectedCategory = lastCreatedCategory
+//    }
     
 }
 
-// MARK: - CategoriesViewControllerProtocol
-
-extension CategoriesViewController: CategoriesViewControllerProtocol {
-    func recieveCategories(categories: [String], currentAt: IndexPath?) {
-        self.stringCategories = categories
-        self.selectedCategory = currentAt
-        tableView.reloadData()
-    }
-}
+//// MARK: - CategoriesViewControllerProtocol
+//extension CategoriesViewController {
+////    func recieveCategories(categories: [String], currentAt: IndexPath?) {
+////        self.stringCategories = categories
+////        self.selectedCategory = currentAt
+////        tableView.reloadData()
+////    }
+//}
 
 // MARK: - TableViewDataSource
-
 extension CategoriesViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        stringCategories.count
+        viewModel?.stringCategories.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -94,16 +131,34 @@ extension CategoriesViewController: UITableViewDataSource {
             return UITableViewCell(frame: .zero)
         }
         
-        if let selectedCategory = selectedCategory {
+        if let selectedCategory = viewModel?.selectedCategory {
             if indexPath.row == selectedCategory.row {
                 cell.setupCheckmark()
             }
         }
         
-        cell.title.text = stringCategories[indexPath.row]
+        let backgroundView = UIView()
+        backgroundView.backgroundColor = .systemGray3
+        cell.selectedBackgroundView = backgroundView
         
-        if indexPath.row == stringCategories.count - 1 {
-            cell.contentView.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMinXMaxYCorner]
+        guard let count = viewModel?.stringCategories.count else {
+            assertionFailure("No stringCategories count")
+            return cell
+        }
+        if indexPath.row == 0 && count > 1 {
+            cell.selectedBackgroundView?.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+            cell.contentView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        }
+        
+        cell.title.text = viewModel?.stringCategories[indexPath.row]
+        
+        if indexPath.row == count - 1 {
+            cell.selectedBackgroundView?.makeCornerRadius(16)
+            cell.contentView.makeCornerRadius(16)
+            cell.contentView.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+            cell.selectedBackgroundView?.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        } else if indexPath.row != count - 1 && indexPath.row != 0 {
+            cell.contentView.layer.cornerRadius = 0
         }
         
         return cell
@@ -112,12 +167,11 @@ extension CategoriesViewController: UITableViewDataSource {
 }
 
 // MARK: - TableViewDelegate
-
 extension CategoriesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        weak var habitOrEventVC = self.presentingViewController as? HabitOrEventViewController
-        habitOrEventVC?.selectedCategory(indexPath: indexPath, categories: self.stringCategories)
-        dismiss(animated: true)
+        dismiss(animated: true) { [weak self] in
+            self?.viewModel?.provideCategories(selected: indexPath)
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -126,7 +180,6 @@ extension CategoriesViewController: UITableViewDelegate {
 }
 
 // MARK: - Views
-
 extension CategoriesViewController {
     private func setupNewCategoryButton() {
         newCategoryButton = .systemButton(with: .chevronLeft, target: self, action: #selector(didTapNewCategoryButton))
