@@ -7,7 +7,7 @@ final class HabitOrEventEmojiCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.backgroundColor = .ypWhite
-        contentView.makeCornerRadius(16)
+        contentView.makeCornerRadius(19)
         setupMainView()
         setupEmoji()
     }

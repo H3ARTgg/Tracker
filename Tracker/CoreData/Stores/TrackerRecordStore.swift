@@ -1,10 +1,17 @@
 import CoreData
 import UIKit
 
-final class TrackerRecordStore: NSObject {
+protocol TrackerRecordStoreProtocol: AnyObject {
+    func addTrackerRecord(_ trackerRecord: TrackerRecord) throws
+    func deleteTrackerRecord(_ trackerRecord: TrackerRecord, for date: Date) throws
+    func recordsCountFor(trackerID: UUID) -> Int
+    func isRecordExistsFor(trackerID: UUID, and date: Date) -> Bool
+}
+
+final class TrackerRecordStore: TrackerRecordStoreProtocol {
     private let context: NSManagedObjectContext
     
-    convenience override init() {
+    convenience init() {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             assertionFailure("no AppDelegate")
             self.init()
@@ -16,7 +23,6 @@ final class TrackerRecordStore: NSObject {
 
     init(context: NSManagedObjectContext) throws {
         self.context = context
-        super.init()
     }
     
     /// Добавляет выполненный день

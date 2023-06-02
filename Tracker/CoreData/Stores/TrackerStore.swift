@@ -1,18 +1,29 @@
 import CoreData
 import UIKit
 
-// MARK: - Delegate Protocol
-protocol TrackerStoreDelegate: AnyObject {
-    func didUpdate()
+protocol TrackerStoreProtocol: AnyObject {
+    /// Добовляет новый трекер в модель
+    func addNewTracker(_ tracker: Tracker, forCategoryTitle category: String) throws
+    /// Обновляет существующий CDTracker(entity)
+    func updateExistingTracker(_ cdTracker: CDTracker, with tracker: Tracker, for category: CDTrackerCategory)
+    /// Проверяет, есть ли данный трекер в модели
+    func checkForExisting(tracker: Tracker) -> Bool
+    /// Возвращает CDTracker(entity) по Tracker
+    func getCDTracker(tracker: Tracker) throws -> CDTracker
+    /// Создает предикаты и выполняет FetchResultController запрос
+    func fetchTrackersByDayOfTheWeekFor(date: Date, searchText: String) throws
+    /// Количество трекеров в result controller'е
+    var trackers: [CDTracker]? { get }
+    /// Возвращает массив CDTrackerCategory из Result Controller'а
+    func getFetchedCategories() -> [CDTrackerCategory]
+    func recreatePersistentContainer()
 }
 
 // MARK: - TrackerStore
-final class TrackerStore: NSObject {
-    private let uiColorMarshalling = UIColorMarshalling()
-    private let trackerCategoryStore = TrackerCategoryStore()
+final class TrackerStore: NSObject, TrackerStoreProtocol {
+    private let trackerCategoryStore: TrackerCategoryStoreProtocol!
     private let weekDayStore = WeekDayStore()
     private let context: NSManagedObjectContext
-    weak var delegate: TrackerStoreDelegate?
     private lazy var fetchedResultsController: NSFetchedResultsController<CDTracker> = {
         let fetchRequest = NSFetchRequest<CDTracker>(entityName: "CDTracker")
         fetchRequest.sortDescriptors = [
@@ -33,20 +44,21 @@ final class TrackerStore: NSObject {
         return fetchedResultsController
     }()
 
-    convenience override init() {
+    convenience init(trackerCategoryStore: TrackerCategoryStoreProtocol) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             assertionFailure("no AppDelegate")
-            self.init()
+            self.init(trackerCategoryStore: trackerCategoryStore)
             return
         }
         let context = appDelegate.persistentContainer.viewContext
-        try! self.init(context: context)
+        try! self.init(context: context, trackerCategoryStore: trackerCategoryStore)
     }
 
-    init(context: NSManagedObjectContext) throws {
+    init(context: NSManagedObjectContext, trackerCategoryStore: TrackerCategoryStoreProtocol) throws {
         self.context = context
-        super.init()
+        self.trackerCategoryStore = trackerCategoryStore
     }
+    
     
     /// Добовляет новый трекер в модель
     func addNewTracker(_ tracker: Tracker, forCategoryTitle category: String) throws {
@@ -62,7 +74,7 @@ final class TrackerStore: NSObject {
             let cdWeekDaysSet = weekDayStore.saveWeekDays(weekDays: weekDays, with: cdTracker)
             cdTracker.weekDays = cdWeekDaysSet
         }
-        cdTracker.colorHex = uiColorMarshalling.hexString(from: tracker.color)
+        cdTracker.colorHex = ColorMarshalling.hexString(from: tracker.color)
         cdTracker.createdAt = tracker.createdAt
         cdTracker.id = tracker.id
         cdTracker.emoji = tracker.emoji
@@ -91,7 +103,7 @@ final class TrackerStore: NSObject {
     }
     
     /// Создает предикаты и выполняет FetchResultController запрос
-    func showTrackersByDayOfTheWeekFor(date: Date, searchText: String) throws {
+    func fetchTrackersByDayOfTheWeekFor(date: Date, searchText: String) throws {
         var predicates = [NSPredicate]()
         
         predicates.append(NSPredicate(
@@ -112,40 +124,37 @@ final class TrackerStore: NSObject {
         fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         
         try fetchedResultsController.performFetch()
-        
-        delegate?.didUpdate()
     }
 }
 
 // MARK: - NSFetchedResultsControllerDelegate
 extension TrackerStore: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        delegate?.didUpdate()
     }
 }
 
 extension TrackerStore {
-    /// Возвращает количество секций
-    var numberOfSections: Int {
-        fetchedResultsController.sections?.count ?? 0
+    /// Количество трекеров в result controller'е
+    var trackers: [CDTracker]? {
+        fetchedResultsController.fetchedObjects ?? []
     }
     
-    /// Возвращает количество ячеек в секции
-    func numberOfRowsInSection(_ section: Int) -> Int {
-        fetchedResultsController.sections?[section].numberOfObjects ?? 0
-    }
-    
-    /// Возвращает CDTracker для конкретного IndexPath
-    func object(at indexPath: IndexPath) -> CDTracker? {
-        fetchedResultsController.object(at: indexPath)
-    }
-
-    /// Возвращает количество полученных категорий
-    func numberOfFetchedCategories() -> Int {
+    /// Возвращает массив CDTrackerCategory из Result Controller'а
+    func getFetchedCategories() -> [CDTrackerCategory] {
         var set: Set<CDTrackerCategory> = []
         fetchedResultsController.fetchedObjects?.forEach({
             set.insert($0.category!)
         })
-        return set.count
+        var array: [CDTrackerCategory] = []
+        set.forEach { array.append($0) }
+        return array
+    }
+    
+    func recreatePersistentContainer() {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            assertionFailure("no AppDelegate")
+            return
+        }
+        appDelegate.recreatePersistentContainer()
     }
 }

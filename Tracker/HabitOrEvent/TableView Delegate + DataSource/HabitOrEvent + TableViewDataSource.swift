@@ -2,7 +2,7 @@ import UIKit
 
 extension HabitOrEventViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        switch choice {
+        switch viewModel?.choice {
         case .habit:
             return 2
         case .event:

@@ -1,16 +1,11 @@
 import UIKit
 
-enum Choice: String {
-    case habit = "Новая привычка"
-    case event = "Новое нерегулярное событие"
-}
-
 protocol NewTrackerDelegate: AnyObject {}
 
 final class NewTrackerViewController: UIViewController {
     private var habitButton = UIButton()
     private var eventButton = UIButton()
-    private weak var delegate: NewTrackerDelegate?
+    var viewModel: NewTrackerViewModel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,41 +14,24 @@ final class NewTrackerViewController: UIViewController {
         setupTitleLabel(with: "Создание трекера")
     }
     
-    required init(delegate: NewTrackerDelegate) {
-        super.init(nibName: .none, bundle: .none)
-        self.delegate = delegate
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     @objc
     private func didTapHabitButton() {
-        guard let habitOrEventDelegate = delegate as? HabitOrEventDelegate else {
-            assertionFailure("NewTrackerDelegate isn't a HabitOrEventDelegate")
-            return
-        }
-        let newHabitVC = HabitOrEventViewController(choice: .habit, delegate: habitOrEventDelegate)
+        let newHabitVC = HabitOrEventViewController()
+        newHabitVC.viewModel = viewModel?.getViewModelForHabitOrEventWith(.habit)
         newHabitVC.modalPresentationStyle = .popover
         present(newHabitVC, animated: true)
     }
     
     @objc
     private func didTapEventButton() {
-        guard let habitOrEventDelegate = delegate as? HabitOrEventDelegate else {
-            assertionFailure("NewTrackerDelegate isn't a HabitOrEventDelegate")
-            return
-        }
-
-        let newEventVC = HabitOrEventViewController(choice: .event, delegate: habitOrEventDelegate)
+        let newEventVC = HabitOrEventViewController()
+        newEventVC.viewModel = viewModel?.getViewModelForHabitOrEventWith(.event)
         newEventVC.modalPresentationStyle = .popover
         present(newEventVC, animated: true)
     }
 }
 
 // MARK: - Views
-
 extension NewTrackerViewController {
     private func setupHabitAndEventButtons() {
         habitButton = UIButton.systemButton(with: UIImage(), target: self, action: #selector(didTapHabitButton))

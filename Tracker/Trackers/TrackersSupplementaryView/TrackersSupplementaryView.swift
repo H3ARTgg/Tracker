@@ -1,7 +1,12 @@
 import UIKit
 
 final class TrackersSupplementaryView: UICollectionReusableView {
-    let titleLabel = UILabel()
+    private let titleLabel = UILabel()
+    var viewModel: TrackersSupplementaryViewModel! {
+        didSet {
+            titleLabel.text = viewModel.title
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)

@@ -8,5 +8,6 @@ struct Constants {
     static let rightArrow = "right_arrow"
     static let checkmark = "checkmark"
     static let selectBorder = "select_border"
-    private init() {}
+    static let firstPageBG = "firstPageBG"
+    static let secondPageBG = "secondPageBG"
 }

@@ -28,9 +28,7 @@ extension HabitOrEventViewController: UICollectionViewDataSource {
         }
     }
     
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        2
-    }
+    func numberOfSections(in collectionView: UICollectionView) -> Int { 2 }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         var id: String

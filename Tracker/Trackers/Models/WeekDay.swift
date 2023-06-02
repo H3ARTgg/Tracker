@@ -1,17 +1,7 @@
-import Foundation
-
-public enum DaysOfTheWeek: Int {
-    case monday = 2
-    case tuesday = 3
-    case wednesday = 4
-    case thursday = 5
-    case friday = 6
-    case saturday = 7
-    case sunday = 1
-}
-
 struct WeekDay {
     let weekDay: Int
+    let everyday: String = "Каждый день"
+    /// Сокращенное название дня недели
     var shortName: String {
         switch weekDay {
         case 2:
@@ -32,9 +22,7 @@ struct WeekDay {
             return "Каждый день"
         }
     }
-    
-    var everyday: String = "Каждый день"
-
+    /// Длинное название дня недели
     var longName: String {
         switch weekDay {
         case 2:

@@ -8,8 +8,8 @@ extension HabitOrEventViewController {
         contentView.addSubview(collectionView)
         
         NSLayoutConstraint.activate([
-            collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 25),
-            collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -25),
+            collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             collectionView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 32),
             collectionView.bottomAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.bottomAnchor)
         ])
@@ -32,7 +32,7 @@ extension HabitOrEventViewController {
         
         contentView.addSubview(tableView)
         
-        switch choice {
+        switch viewModel?.choice {
         case .habit:
             tableView.heightAnchor.constraint(equalToConstant: 148).isActive = true
         case .event:

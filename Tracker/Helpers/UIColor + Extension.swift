@@ -12,6 +12,7 @@ extension UIColor {
     static let searchFieldColor = UIColor(named: "SearchFieldColor")
     static let searchFieldTintColor = UIColor(named: "SearchFieldTintColor")
     static let ypAlphaWhite = UIColor(named: "White(alpha)")
+    static let onlyBlack = UIColor(named: "OnlyBlack")
     
     // Selection Colors
     static let selection1 = UIColor(named: "Color selection 1")

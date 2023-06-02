@@ -4,6 +4,7 @@ final class NewCategoryViewController: UIViewController {
     private let placeholderString = "Введите название категории"
     private let textField = UITextField()
     private var doneButton = UIButton()
+    var viewModel: NewCategoryViewModel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,9 +22,9 @@ final class NewCategoryViewController: UIViewController {
     @objc
     private func didTapDoneButton() {
         guard let text = textField.text else { return }
-        weak var categoriesVC = self.presentingViewController as? CategoriesViewController
-        categoriesVC?.addNewCategory(category: text)
-        dismiss(animated: true)
+        dismiss(animated: true) { [weak self] in
+            self?.viewModel?.addNewCategory(text)
+        }
     }
     
     @objc
@@ -37,7 +38,6 @@ final class NewCategoryViewController: UIViewController {
 }
 
 // MARK: - TextFieldDelegate
-
 extension NewCategoryViewController: UITextFieldDelegate {
     func textField(
         _ textField: UITextField,
@@ -73,8 +73,8 @@ extension NewCategoryViewController: UITextFieldDelegate {
         return true
     }
 }
-// MARK: - Views
 
+// MARK: - Views
 extension NewCategoryViewController {
     private func setupTextField() {
         textField.delegate = self
