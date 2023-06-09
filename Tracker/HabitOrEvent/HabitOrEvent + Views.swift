@@ -37,7 +37,16 @@ extension HabitOrEventViewController {
             tableView.heightAnchor.constraint(equalToConstant: 148).isActive = true
         case .event:
             tableView.heightAnchor.constraint(equalToConstant: 73).isActive = true
-        case .none:
+        case .edit(let choice):
+            switch choice {
+            case .habit:
+                tableView.heightAnchor.constraint(equalToConstant: 148).isActive = true
+            case .event:
+                tableView.heightAnchor.constraint(equalToConstant: 73).isActive = true
+            default:
+                tableView.heightAnchor.constraint(equalToConstant: 148).isActive = true
+            }
+        default:
             tableView.heightAnchor.constraint(equalToConstant: 148).isActive = true
         }
         
@@ -55,7 +64,7 @@ extension HabitOrEventViewController {
     
     func setupWarningLabel() {
         warningLabel.font = .systemFont(ofSize: 17, weight: .regular)
-        warningLabel.text = "Ограничение 38 символов"
+        warningLabel.text = NSLocalizedString(.localeKeys.warning, comment: "Title for 38 max symbols")
         warningLabel.textColor = .ypRed
         warningLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(warningLabel)
@@ -69,7 +78,7 @@ extension HabitOrEventViewController {
     func setupTextField() {
         textField.delegate = self
         textField.attributedPlaceholder = NSAttributedString(
-            string: "Введите название трекера",
+            string: NSLocalizedString(.localeKeys.typeTrackerTitle, comment: "Type tracker title placeholder"),
             attributes: [NSAttributedString.Key.foregroundColor : UIColor.ypGray!])
         textField.setPaddingFor(left: 16)
         textField.clearButtonMode = .always
@@ -92,7 +101,7 @@ extension HabitOrEventViewController {
         createButton = .systemButton(with: .xMark, target: self, action: done)
         createButton.isUserInteractionEnabled = false
         createButton.setImage(nil, for: .normal)
-        createButton.setTitle("Создать", for: .normal)
+        createButton.setTitle(NSLocalizedString(.localeKeys.create, comment: "Create button title"), for: .normal)
         createButton.setTitleColor(.ypBlack, for: .normal)
         createButton.backgroundColor = .ypGray
         createButton.makeCornerRadius(16)
@@ -100,7 +109,7 @@ extension HabitOrEventViewController {
         
         cancelButton = .systemButton(with: .xMark, target: self, action: cancel)
         cancelButton.setImage(nil, for: .normal)
-        cancelButton.setTitle("Отменить", for: .normal)
+        cancelButton.setTitle(NSLocalizedString(.localeKeys.cancel, comment: "Cancel button title"), for: .normal)
         cancelButton.setTitleColor(.ypRed, for: .normal)
         cancelButton.backgroundColor = .ypAlphaWhite
         cancelButton.layer.borderWidth = 1
@@ -126,6 +135,43 @@ extension HabitOrEventViewController {
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
+    }
+    
+    func setupRecordEditing(with recordText: String, minusAction: Selector, plusAction: Selector) {
+        editRecordLabel.font = .systemFont(ofSize: 32, weight: .bold)
+        editRecordLabel.text = recordText
+        
+        let minusImage = UIImage.minusForButton.imageResized(to: CGSize(width: 14, height: 4), color: .ypWhite)
+        editMinusButton = .systemButton(with: minusImage, target: self, action: minusAction)
+        
+        let plusImage = UIImage.plusForButton.imageResized(to: CGSize(width: 10, height: 10), color: .ypWhite)
+        editPlusButton = .systemButton(with: plusImage, target: self, action: plusAction)
+   
+        stackViewForEdit.axis = .horizontal
+        stackViewForEdit.alignment = .center
+        stackViewForEdit.distribution = .equalSpacing
+        stackViewForEdit.spacing = 24
+        stackViewForEdit.addArrangedSubview(editMinusButton)
+        stackViewForEdit.addArrangedSubview(editRecordLabel)
+        stackViewForEdit.addArrangedSubview(editPlusButton)
+        stackViewForEdit.translatesAutoresizingMaskIntoConstraints = false
+        
+        [editMinusButton, editPlusButton].forEach {
+            $0.heightAnchor.constraint(equalToConstant: 32).isActive = true
+            $0.widthAnchor.constraint(equalToConstant: 32).isActive = true
+            $0.backgroundColor = viewModel?.colorForEditButtons
+            $0.makeCornerRadius(16)
+            $0.tintColor = .ypWhite
+            $0.translatesAutoresizingMaskIntoConstraints = false
+        }
+        
+        view.addSubview(stackViewForEdit)
+        
+        NSLayoutConstraint.activate([
+            stackViewForEdit.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 78),
+            stackViewForEdit.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -78),
+            stackViewForEdit.topAnchor.constraint(equalTo: view.topAnchor, constant: 72)
         ])
     }
 }

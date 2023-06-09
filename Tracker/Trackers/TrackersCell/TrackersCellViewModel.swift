@@ -25,7 +25,9 @@ final class TrackersCellViewModel: Identifiable {
     
     private(set) var recordCount: Int {
         didSet {
-            daysRecordText = DaysOfTheWeek.getRightTextDeclinationFor(recordCount: recordCount)
+            daysRecordText = String.localizedStringWithFormat(
+                NSLocalizedString(.localeKeys.numberOfDays, comment: ""),
+                recordCount)
         }
     }
     @Observable private(set) var daysRecordText: String = "0 дней"
@@ -40,7 +42,9 @@ final class TrackersCellViewModel: Identifiable {
         self.currentDate = cellSample.currentDate
         self.delegate = cellSample.delegate
         self.rowNumber = cellSample.rowNumber
-        self.daysRecordText = DaysOfTheWeek.getRightTextDeclinationFor(recordCount: recordCount)
+        self.daysRecordText = String.localizedStringWithFormat(
+            NSLocalizedString(.localeKeys.numberOfDays, comment: ""),
+            recordCount)
     }
     
     func isDateBiggerThanRealTime() -> Bool {

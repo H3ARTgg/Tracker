@@ -44,6 +44,7 @@ final class TrackersCell: UICollectionViewCell {
             }
         }
     }
+    var interactionDelegate: UIContextMenuInteractionDelegate?
     
     @objc
     private func addDay() {
@@ -84,9 +85,14 @@ final class TrackersCell: UICollectionViewCell {
 // MARK: - Views
 extension TrackersCell {
     private func setupCardViewFor(rowNumber: Int) {
-        cardView.makeCornerRadius(16)
+        // Пришлось поставить 12, а не 16, так как ContextMenu показывается с другим CornerRadius
+        cardView.makeCornerRadius(12)
         cardView.backgroundColor = selectionColor
         cardView.translatesAutoresizingMaskIntoConstraints = false
+        if let interactionDelegate = self.interactionDelegate {
+            let interaction = UIContextMenuInteraction(delegate: interactionDelegate)
+            cardView.addInteraction(interaction)
+        }
         addSubview(cardView)
         /*
          Если выставлять trailing и leading = 16 у collectionView, то скролл индикатор налазит на ячейки, в таком случае нужно менять констрейнты trailing и leading у ячейки, но..
@@ -131,7 +137,7 @@ extension TrackersCell {
     
     private func setupCardEmoji() {
         cardEmoji.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(cardEmoji)
+        cardView.addSubview(cardEmoji)
         cardEmoji.font = .systemFont(ofSize: 13)
         
         NSLayoutConstraint.activate([
@@ -177,7 +183,6 @@ extension TrackersCell {
     
     private func setupDaysLabel() {
         daysLabel.numberOfLines = 1
-        daysLabel.text = "0 дней"
         daysLabel.translatesAutoresizingMaskIntoConstraints = false
         daysLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         daysLabel.textColor = .ypBlack

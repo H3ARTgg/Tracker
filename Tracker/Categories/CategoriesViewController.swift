@@ -1,16 +1,13 @@
 import UIKit
 
+// TODO: - Доделать под MVVM (ячейки)
 final class CategoriesViewController: UIViewController {
     private let cellIdentifier = "categoriesCell"
     private let noContentLabel = UILabel()
     private let noContentImageView = UIImageView()
     private let tableView = UITableView()
     private var newCategoryButton = UIButton()
-//    private var lastAmount: CGFloat!
-//    private var stringCategories: [String] = []
-//    private var selectedCategory: IndexPath?
     var viewModel: CategoriesViewModel?
-    //weak var delegate: CategoriesDelegate?
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -20,7 +17,7 @@ final class CategoriesViewController: UIViewController {
         }
         
         if viewModel.stringCategories.isEmpty {
-            setupTitleAndImageIfNoContent(with: "Привычки и события можно объединить по смыслу", label: noContentLabel, imageView: noContentImageView, image: .noTrackers)
+            setupTitleAndImageIfNoContent(with: NSLocalizedString(.localeKeys.categoryEmptyTitle, comment: "Categories empty state"), label: noContentLabel, imageView: noContentImageView, image: .noTrackers)
             tableView.isHidden = true
         } else {
             tableView.isHidden = false
@@ -32,7 +29,7 @@ final class CategoriesViewController: UIViewController {
         view.backgroundColor = .ypWhite
         setupNewCategoryButton()
         setupTableView()
-        setupTitleLabel(with: "Категория")
+        setupTitleLabel(with: NSLocalizedString(.localeKeys.category, comment: "Category title"))
         
         viewModel?
             .$stringCategories.bind(action: { [weak self] _ in
@@ -84,40 +81,7 @@ final class CategoriesViewController: UIViewController {
             tableView.isHidden = false
         }
     }
-    
-//    func addNewCategory(category: String) {
-//        if stringCategories.isEmpty {
-//            removeNoContentViews()
-//        }
-//        if stringCategories.contains(category) {
-//            return
-//        }
-//        self.stringCategories.append(category)
-//        reloadCurrentCheckmarkForLastCreatedCategory()
-//
-//        tableView.reloadData()
-//    }
-    
-//    private func resetCurrentCheckmarkForLastCreatedCategory() {
-//            guard let cell = tableView.cellForRow(at: selectedCategory) as? CategoriesCell else {
-//                assertionFailure("No cell for that IndexPath: \(selectedCategory)")
-//                return
-//            }
-//            cell.removeCheckmark()
-//        let lastCreatedCategory = IndexPath(row: stringCategories.count - 1, section: 0)
-//        self.selectedCategory = lastCreatedCategory
-//    }
-    
 }
-
-//// MARK: - CategoriesViewControllerProtocol
-//extension CategoriesViewController {
-////    func recieveCategories(categories: [String], currentAt: IndexPath?) {
-////        self.stringCategories = categories
-////        self.selectedCategory = currentAt
-////        tableView.reloadData()
-////    }
-//}
 
 // MARK: - TableViewDataSource
 extension CategoriesViewController: UITableViewDataSource {
@@ -184,7 +148,7 @@ extension CategoriesViewController {
     private func setupNewCategoryButton() {
         newCategoryButton = .systemButton(with: .chevronLeft, target: self, action: #selector(didTapNewCategoryButton))
         newCategoryButton.setImage(nil, for: .normal)
-        newCategoryButton.setTitle("Добавить категорию", for: .normal)
+        newCategoryButton.setTitle(NSLocalizedString(.localeKeys.categoryAdd, comment: "Title for button that adds a new category"), for: .normal)
         newCategoryButton.setTitleColor(.ypWhite, for: .normal)
         newCategoryButton.backgroundColor = .ypBlack
         newCategoryButton.titleLabel?.textAlignment = .center

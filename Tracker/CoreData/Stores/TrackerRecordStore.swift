@@ -6,6 +6,7 @@ protocol TrackerRecordStoreProtocol: AnyObject {
     func deleteTrackerRecord(_ trackerRecord: TrackerRecord, for date: Date) throws
     func recordsCountFor(trackerID: UUID) -> Int
     func isRecordExistsFor(trackerID: UUID, and date: Date) -> Bool
+    func getAllTrackerRecordsFor( _ trackerID: UUID) -> [TrackerRecord] 
 }
 
 final class TrackerRecordStore: TrackerRecordStoreProtocol {
@@ -51,6 +52,23 @@ final class TrackerRecordStore: TrackerRecordStoreProtocol {
         request.predicate = NSPredicate(format: "%K == %@", "id", trackerID as CVarArg)
         let records = try? context.fetch(request)
         return records != nil ? records!.count : 0
+    }
+    
+    /// Возвращает массив TrackerRecord для конкретного UUID трекера
+    func getAllTrackerRecordsFor( _ trackerID: UUID) -> [TrackerRecord] {
+        let request = NSFetchRequest<CDTrackerRecord>(entityName: "CDTrackerRecord")
+        request.predicate = NSPredicate(format: "%K == %@", "id", trackerID as CVarArg)
+        let records = try? context.fetch(request)
+        var trackerRecords: [TrackerRecord] = []
+        records?.forEach({
+            guard let id = $0.id, let date = $0.date else { return }
+            let trackerRecord = TrackerRecord(
+                id: id,
+                date: date
+            )
+            trackerRecords.append(trackerRecord)
+        })
+        return trackerRecords.sorted { $0.date < $1.date }
     }
     
     /// Проверяет, выполнен ли трекер для данного дня

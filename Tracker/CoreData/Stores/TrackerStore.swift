@@ -10,6 +10,8 @@ protocol TrackerStoreProtocol: AnyObject {
     func checkForExisting(tracker: Tracker) -> Bool
     /// Возвращает CDTracker(entity) по Tracker
     func getCDTracker(tracker: Tracker) throws -> CDTracker
+    /// Возвращает CDTracker(entity) по UUID
+    func getCDTracker(_ trackerID: UUID) throws -> CDTracker
     /// Создает предикаты и выполняет FetchResultController запрос
     func fetchTrackersByDayOfTheWeekFor(date: Date, searchText: String) throws
     /// Количество трекеров в result controller'е
@@ -17,6 +19,8 @@ protocol TrackerStoreProtocol: AnyObject {
     /// Возвращает массив CDTrackerCategory из Result Controller'а
     func getFetchedCategories() -> [CDTrackerCategory]
     func recreatePersistentContainer()
+    func removeTracker(_ trackerID: UUID, for category: String)
+    func updateExistingTrackerCategory(_ cdTracker: CDTracker, with category: CDTrackerCategory) throws
 }
 
 // MARK: - TrackerStore
@@ -82,6 +86,12 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         cdTracker.category = category
     }
     
+    func updateExistingTrackerCategory(_ cdTracker: CDTracker, with category: CDTrackerCategory) throws {
+        cdTracker.lastCategoryName = cdTracker.category?.title
+        cdTracker.category = category
+        try context.save()
+    }
+    
     /// Проверяет, есть ли данный трекер в модели
     func checkForExisting(tracker: Tracker) -> Bool {
         let request = NSFetchRequest<CDTracker>(entityName: "CDTracker")
@@ -98,6 +108,13 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     func getCDTracker(tracker: Tracker) throws -> CDTracker {
         let request = NSFetchRequest<CDTracker>(entityName: "CDTracker")
         request.predicate = NSPredicate(format: "%K == %@", "id", tracker.id as CVarArg)
+        let foundTrackers = try context.fetch(request)
+        return foundTrackers[0]
+    }
+    /// Возвращает CDTracker(entity) по UUID
+    func getCDTracker(_ trackerID: UUID) throws -> CDTracker {
+        let request = NSFetchRequest<CDTracker>(entityName: "CDTracker")
+        request.predicate = NSPredicate(format: "%K == %@", "id", trackerID as CVarArg)
         let foundTrackers = try context.fetch(request)
         return foundTrackers[0]
     }
@@ -124,6 +141,14 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         
         try fetchedResultsController.performFetch()
+    }
+    
+    func removeTracker(_ trackerID: UUID, for category: String) {
+        let cdTracker = try! getCDTracker(trackerID)
+        let cdCategory = try! trackerCategoryStore.getCDTrackerCategoryFor(title: category)
+        context.delete(cdTracker)
+        context.delete(cdCategory)
+        try! context.save()
     }
 }
 

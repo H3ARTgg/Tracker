@@ -1,15 +1,15 @@
 import Foundation
 
 protocol ScheduleCellDelegate: AnyObject {
-    func choiceForDay(_ check: Bool, indexPath: IndexPath)
+    func choiceForDay(_ isSwitherOn: Bool, indexPath: IndexPath)
 }
 
 protocol ScheduleViewControllerProtocol: AnyObject {
     var delegate: ScheduleViewControllerDelegate? { get set }
-    func recieveDaysOfTheWeek(daysOfTheWeek: [Int: WeekDay])
+    func recieveDaysOfTheWeek(daysOfTheWeek: [WeekDay])
 }
 
 protocol ScheduleViewControllerDelegate: AnyObject {
-    func didRecieveDaysOfTheWeek(daysOfTheWeek: [Int: WeekDay])
+    func didRecieveDaysOfTheWeek(daysOfTheWeek: [WeekDay])
 }
 

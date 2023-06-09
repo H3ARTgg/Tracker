@@ -42,7 +42,7 @@ extension UIViewController {
         ])
     }
     
-    func setupScrollViewAndContentView(scrollView: UIScrollView, contentView: UIView, withExtraSpace: CGFloat? = nil) {
+    func setupScrollViewAndContentView(scrollView: UIScrollView, contentView: UIView, withExtraSpace: CGFloat? = nil, isEditing: Bool? = nil) {
         var extraSpace: CGFloat = 0
         if let withExtraSpace = withExtraSpace {
             extraSpace += withExtraSpace
@@ -55,8 +55,13 @@ extension UIViewController {
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(scrollView)
         
+        if isEditing != nil {
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: 65 + 80).isActive = true
+        } else {
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: 65).isActive = true
+        }
+        
         NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: 65),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)

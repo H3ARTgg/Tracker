@@ -3,6 +3,7 @@ import UIKit
 
 protocol WeekDayStoreProtocol: AnyObject {
     func saveWeekDays(weekDays: [WeekDay], with cdTracker: CDTracker) -> NSSet
+    func getWeekDaysFrom(_ set: NSSet) -> [WeekDay]
 }
 
 final class WeekDayStore: WeekDayStoreProtocol {
@@ -33,5 +34,15 @@ final class WeekDayStore: WeekDayStoreProtocol {
         }
         
         return NSSet(array: cdWeekDayArray)
+    }
+    
+    func getWeekDaysFrom(_ set: NSSet) -> [WeekDay] {
+        var weekDays: [WeekDay] = []
+        set.forEach { element in
+            guard let cdWeekDay = element as? CDWeekDay else { return }
+            let weekDay = WeekDay(weekDay: Int(cdWeekDay.weekDay))
+            weekDays.append(weekDay)
+        }
+        return weekDays
     }
 }

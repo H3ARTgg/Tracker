@@ -23,9 +23,24 @@ final class TabBarController: UITabBarController {
         let statisticItemImageSelected = UIImage(named: Constants.statisticBarItem)?.withTintColor(.ypBlue ?? .blue)
         
         // Bar items for VC's
-        trackerListVC.tabBarItem = UITabBarItem(title: "Трекеры", image: trackerItemImage, selectedImage: trackerItemImageSelected)
+        trackerListVC.tabBarItem = UITabBarItem(
+            title: NSLocalizedString(
+                .localeKeys.trackers,
+                comment: "Trackers bar item title"
+            ),
+            image: trackerItemImage,
+            selectedImage: trackerItemImageSelected
+        )
+        statisticVC.tabBarItem = UITabBarItem(
+            title: NSLocalizedString(
+                .localeKeys.statistic,
+                comment: "Statistic bar item title"
+            ),
+            image: statisticItemImage,
+            selectedImage: statisticItemImageSelected
+        )
+        
         trackerListVC.tabBarItem.setTitleTextAttributes([.font : UIFont.systemFont(ofSize: 10, weight: .medium)], for: .normal)
-        statisticVC.tabBarItem = UITabBarItem(title: "Статистика", image: statisticItemImage, selectedImage: statisticItemImageSelected)
         statisticVC.tabBarItem.setTitleTextAttributes([.font : UIFont.systemFont(ofSize: 10, weight: .medium)], for: .normal)
         
         self.viewControllers = [navigationVC, statisticVC]

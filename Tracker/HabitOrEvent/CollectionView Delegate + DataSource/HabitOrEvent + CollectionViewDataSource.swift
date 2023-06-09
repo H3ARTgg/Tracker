@@ -15,7 +15,8 @@ extension HabitOrEventViewController: UICollectionViewDataSource {
                 assertionFailure("No collection cell for that identifier")
                 return UICollectionViewCell(frame: .zero)
             }
-            cell.emoji.text = String.emojisArray[indexPath.row]
+            
+            viewModel?.configure(cell, with: indexPath)
             return cell
         } else {
             collectionView.register(HabitOrEventColorCell.self, forCellWithReuseIdentifier: colorCellIdentifier)
@@ -23,7 +24,7 @@ extension HabitOrEventViewController: UICollectionViewDataSource {
                 assertionFailure("No collection cell for that identifier")
                 return UICollectionViewCell(frame: .zero)
             }
-            cell.colorView.backgroundColor = UIColor.selectionColors[indexPath.row]
+            viewModel?.configure(cell, with: indexPath)
             return cell
         }
     }
@@ -46,9 +47,9 @@ extension HabitOrEventViewController: UICollectionViewDataSource {
             return UICollectionReusableView(frame: .zero)
         }
         if indexPath.section == 0 {
-            view.titleLabel.text = "Emoji"
+            view.titleLabel.text = NSLocalizedString(.localeKeys.emoji, comment: "Header for emojis")
         } else {
-            view.titleLabel.text = "Цвет"
+            view.titleLabel.text = NSLocalizedString(.localeKeys.color, comment: "Header for colors")
         }
         
         return view

@@ -11,7 +11,7 @@ final class NewTrackerViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
         setupHabitAndEventButtons()
-        setupTitleLabel(with: "Создание трекера")
+        setupTitleLabel(with: NSLocalizedString(.localeKeys.trackerCreation, comment: "Title for tracker creation"))
     }
     
     @objc
@@ -37,8 +37,8 @@ extension NewTrackerViewController {
         habitButton = UIButton.systemButton(with: UIImage(), target: self, action: #selector(didTapHabitButton))
         eventButton = UIButton.systemButton(with: UIImage(), target: self, action: #selector(didTapEventButton))
         
-        habitButton.setTitle("Привычка", for: .normal)
-        eventButton.setTitle("Нерегулярное событие", for: .normal)
+        habitButton.setTitle(NSLocalizedString(.localeKeys.habit, comment: "Habit button title"), for: .normal)
+        eventButton.setTitle(NSLocalizedString(.localeKeys.event, comment: "Event button title"), for: .normal)
         
         setSettingForButton(habitButton)
         setSettingForButton(eventButton)

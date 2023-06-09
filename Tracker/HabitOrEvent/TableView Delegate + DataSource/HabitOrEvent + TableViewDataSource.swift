@@ -7,7 +7,16 @@ extension HabitOrEventViewController: UITableViewDataSource {
             return 2
         case .event:
             return 1
-        case .none:
+        case .edit(let choice):
+            switch choice {
+            case .habit:
+                return 2
+            case .event:
+                return 1
+            case .edit(_):
+                return 0
+            }
+        default:
             return 0
         }
     }
@@ -18,7 +27,14 @@ extension HabitOrEventViewController: UITableViewDataSource {
             return UITableViewCell(frame: .zero)
         }
         
-        cell.title.text = cellsStrings[indexPath.row]
+        switch indexPath.row {
+        case 0:
+            cell.title.text = NSLocalizedString(.localeKeys.category, comment: "Text for Category cell")
+        case 1:
+            cell.title.text = NSLocalizedString(.localeKeys.schedule, comment: "Text for Schedule cell")
+        default:
+            cell.title.text = "Error"
+        }
         
         return cell
     }

@@ -53,6 +53,9 @@ extension HabitOrEventViewController: UICollectionViewDelegateFlowLayout {
             viewModel?.selectColor(at: indexPath)
             cell.selectColor()
             isReadyForCreate()
+            [editPlusButton, editMinusButton].forEach {
+                $0.backgroundColor = viewModel?.colorForEditButtons
+            }
         }
     }
 }
