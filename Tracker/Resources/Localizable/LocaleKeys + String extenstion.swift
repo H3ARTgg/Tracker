@@ -37,6 +37,7 @@ final class LocaleKeys {
     let unpin = "unpin"
     let edit = "edit"
     let delete = "delete"
+    let deleteConfirmation = "delete.confirmation"
     
     // Days of the week
     let mondayLong = "monday.long"

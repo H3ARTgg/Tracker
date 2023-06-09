@@ -35,6 +35,7 @@
 "unpin" = "Détacher";
 "edit" = "Modifier";
 "delete" = "Supprimer";
+"delete.confirmation" = "Voulez-vous vraiment supprimer le traceur?";
 
 // Days of the week
 "monday.long" = "Lundi";

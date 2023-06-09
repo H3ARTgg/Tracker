@@ -35,6 +35,7 @@
 "unpin" = "Открепить";
 "edit" = "Редактировать";
 "delete" = "Удалить";
+"delete.confirmation" = "Уверены, что хотите удалить трекер?";
 
 // Days of the week
 "monday.long" = "Понедельник";
