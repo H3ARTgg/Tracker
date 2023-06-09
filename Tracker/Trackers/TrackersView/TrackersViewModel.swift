@@ -6,16 +6,18 @@ final class TrackersViewModel: NewTrackerDelegate {
     private let trackerStore: TrackerStoreProtocol!
     private let trackerRecordStore: TrackerRecordStoreProtocol!
     private let weekDayStore: WeekDayStoreProtocol!
+    private let analyticsService: AnalyticsServiceProtocol!
     private let pinnedTitle = NSLocalizedString(.localeKeys.pinned, comment: "")
     private(set) var stringCategories: [String] = []
     @Observable private(set) var trackersCategories: [TrackersSupplementaryViewModel] = []
     
-    init(date: Date, trackerCategoryStore: TrackerCategoryStoreProtocol, trackerStore: TrackerStoreProtocol, trackerRecordStore: TrackerRecordStoreProtocol, weekDayStore: WeekDayStoreProtocol) {
+    init(date: Date, trackerCategoryStore: TrackerCategoryStoreProtocol, trackerStore: TrackerStoreProtocol, trackerRecordStore: TrackerRecordStoreProtocol, weekDayStore: WeekDayStoreProtocol, analyticsService: AnalyticsServiceProtocol) {
         self.currentDate = date
         self.trackerCategoryStore = trackerCategoryStore
         self.trackerStore = trackerStore
         self.trackerRecordStore = trackerRecordStore
         self.weekDayStore = weekDayStore
+        self.analyticsService = analyticsService
         showTrackersFor(date: currentDate, search: "")
     }
     
@@ -97,7 +99,8 @@ final class TrackersViewModel: NewTrackerDelegate {
     
     /// Возвращает ViewModel для NewTrackerViewController
     func getViewModelForNewTracker() -> NewTrackerViewModel {
-        NewTrackerViewModel(delegate: self)
+        analyticsService.reportWishToCreateTracker()
+        return NewTrackerViewModel(delegate: self)
     }
     
     /// Закрепляет ячейку
@@ -143,6 +146,7 @@ final class TrackersViewModel: NewTrackerDelegate {
                 break
             }
         }
+        analyticsService.reportTrackerDeletion()
         showTrackersFor(date: currentDate, search: "")
     }
     
