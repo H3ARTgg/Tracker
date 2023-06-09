@@ -1,4 +1,7 @@
 import UIKit
+protocol TrackersViewModelDelegate {
+    func updateCompletedTrackers()
+}
 
 final class TrackersViewModel: NewTrackerDelegate {
     private var currentDate: Date
@@ -10,6 +13,7 @@ final class TrackersViewModel: NewTrackerDelegate {
     private let pinnedTitle = NSLocalizedString(.localeKeys.pinned, comment: "")
     private(set) var stringCategories: [String] = []
     @Observable private(set) var trackersCategories: [TrackersSupplementaryViewModel] = []
+    var delegate: TrackersViewModelDelegate?
     
     init(date: Date, trackerCategoryStore: TrackerCategoryStoreProtocol, trackerStore: TrackerStoreProtocol, trackerRecordStore: TrackerRecordStoreProtocol, weekDayStore: WeekDayStoreProtocol, analyticsService: AnalyticsServiceProtocol) {
         self.currentDate = date
@@ -190,6 +194,8 @@ extension TrackersViewModel: TrackersCellDelegate {
         } else {
             try? trackerRecordStore.deleteTrackerRecord(newRecord, for: currentDate)
         }
+        
+        delegate?.updateCompletedTrackers()
     }
 }
 

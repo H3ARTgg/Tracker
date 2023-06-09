@@ -38,6 +38,7 @@ final class LocaleKeys {
     let edit = "edit"
     let delete = "delete"
     let deleteConfirmation = "delete.confirmation"
+    let trackersCompleted = "trackers.completed"
     
     // Days of the week
     let mondayLong = "monday.long"

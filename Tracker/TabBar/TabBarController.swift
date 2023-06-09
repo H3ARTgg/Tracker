@@ -12,8 +12,11 @@ final class TabBarController: UITabBarController {
         super.viewWillAppear(animated)
         // Controllers
         let trackerListVC = TrackersViewController()
-        trackerListVC.viewModel = viewModel?.getViewModelForTrackers()
         let statisticVC = StatisticViewController()
+        let viewModels = viewModel?.getViewModels()
+        trackerListVC.viewModel = viewModels?[0] as? TrackersViewModel
+        statisticVC.viewModel = viewModels?[1] as? StatisticViewModel
+        
         let navigationVC = UINavigationController(rootViewController: trackerListVC)
         
         // Images

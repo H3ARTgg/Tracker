@@ -36,6 +36,7 @@
 "edit" = "Редактировать";
 "delete" = "Удалить";
 "delete.confirmation" = "Уверены, что хотите удалить трекер?";
+"trackers.completed" = "Трекеров завершено";
 
 // Days of the week
 "monday.long" = "Понедельник";
