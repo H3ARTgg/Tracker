@@ -359,7 +359,6 @@ extension TrackersViewController {
         let deleteAction = UIAlertAction(title: NSLocalizedString(.localeKeys.delete, comment: ""), style: .destructive) { [weak self] _ in
             self?.viewModel?.delete(cell)
         }
-        
         let cancelAction = UIAlertAction(title: NSLocalizedString(.localeKeys.cancel, comment: ""), style: .cancel) { _ in
             alert.dismiss(animated: true)
         }
