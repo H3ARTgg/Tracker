@@ -238,8 +238,8 @@ extension TrackersViewController: UIContextMenuInteractionDelegate {
                     self?.presentEditorFor(with: cell)
                 }
                 
-                let deleteAction = UIAction(title: NSLocalizedString(.localeKeys.delete, comment: ""), attributes: .destructive) { _ in
-                    viewModel.delete(cell)
+                let deleteAction = UIAction(title: NSLocalizedString(.localeKeys.delete, comment: ""), attributes: .destructive) { [weak self] _ in
+                    self?.setupDeleteConfirmation(cell)
                 }
                 
                 if viewModel.isPinned(cell) {
@@ -249,8 +249,6 @@ extension TrackersViewController: UIContextMenuInteractionDelegate {
                 }
             }
     }
-    
-    
 }
 
 // MARK: - Views Setup
@@ -354,6 +352,21 @@ extension TrackersViewController {
             searchCancelButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             searchCancelButton.centerYAnchor.constraint(equalTo: searchField.centerYAnchor)
         ])
+    }
+    
+    private func setupDeleteConfirmation(_ cell: TrackersCell) {
+        let alert = UIAlertController(title: "", message: "Уверены что хотите удалить трекер?", preferredStyle: .actionSheet)
+        let deleteAction = UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
+            self?.viewModel?.delete(cell)
+        }
+        
+        let cancelAction = UIAlertAction(title: "Отменить", style: .cancel) { _ in
+            alert.dismiss(animated: true)
+        }
+        
+        alert.addAction(cancelAction)
+        alert.addAction(deleteAction)
+        present(alert, animated: true)
     }
 }
 

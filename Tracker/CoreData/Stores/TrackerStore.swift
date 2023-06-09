@@ -21,6 +21,7 @@ protocol TrackerStoreProtocol: AnyObject {
     func recreatePersistentContainer()
     func removeTracker(_ trackerID: UUID, for category: String)
     func updateExistingTrackerCategory(_ cdTracker: CDTracker, with category: CDTrackerCategory) throws
+    func makeTrackersSamples()
 }
 
 // MARK: - TrackerStore
@@ -149,6 +150,49 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         context.delete(cdTracker)
         context.delete(cdCategory)
         try! context.save()
+    }
+    
+    func makeTrackersSamples() {
+        let trackerNames1 = ["Tracker_1", "Tracker_2", "Tracker_3", "Tracker_4"]
+        let trackerNames2 = ["Tracker_5", "Tracker_6", "Tracker_7", "Tracker_8"]
+        var trackerArray1: [Tracker] = []
+        var trackerArray2: [Tracker] = []
+        for name in trackerNames1 {
+            let tracker = Tracker(
+                id: UUID(),
+                name: name,
+                color: (.selectionColors.randomElement()! ?? .black),
+                emoji: String.emojisArray.randomElement() ?? "🌺 ",
+                daysOfTheWeek: nil,
+                createdAt: Date()
+            )
+            trackerArray1.append(tracker)
+        }
+        for name in trackerNames2 {
+            let tracker = Tracker(
+                id: UUID(),
+                name: name,
+                color: (.selectionColors.randomElement()! ?? .black),
+                emoji: String.emojisArray.randomElement() ?? "🌺 ",
+                daysOfTheWeek: nil,
+                createdAt: Date()
+            )
+            trackerArray2.append(tracker)
+        }
+        
+        let firstCategory = TrackerCategory(title: "Category_1", trackers: trackerArray1, createdAt: Date())
+        let secondCategoty = TrackerCategory(title: "Category_2", trackers: trackerArray2, createdAt: Date())
+        
+        trackerCategoryStore.addNewTrackerCategory(firstCategory)
+        trackerCategoryStore.addNewTrackerCategory(secondCategoty)
+        
+        trackerArray1.forEach { [weak self] in
+            try? self?.addNewTracker($0, forCategoryTitle: firstCategory.title)
+        }
+        
+        trackerArray2.forEach { [weak self] in
+            try? self?.addNewTracker($0, forCategoryTitle: secondCategoty.title)
+        }
     }
 }
 
