@@ -37,6 +37,7 @@
 "delete" = "Supprimer";
 "delete.confirmation" = "Voulez-vous vraiment supprimer le traceur?";
 "trackers.completed" = "Traqueurs terminés";
+"statistic.nothing" = "Rien à analyser";
 
 // Days of the week
 "monday.long" = "Lundi";

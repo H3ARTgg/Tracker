@@ -5,23 +5,56 @@ final class StatisticViewController: UIViewController {
     private let trackersDoneView = UIView()
     private let trackersDoneCountLabel = UILabel()
     private let trackersDoneLabel = UILabel()
+    private let noContentLabel = UILabel()
+    private let noContentImageView = UIImageView()
     var viewModel: StatisticViewModel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
-        
+        guard let viewModel = viewModel else {
+            return
+        }
+
         setupHeaderLabel()
-        setupTrackersDoneView()
         
-        viewModel?.$recordCount.bind(action: { [weak self] recordCount in
-            self?.trackersDoneCountLabel.text = "\(recordCount)"
+        if viewModel.recordCount == 0 {
+            setupTitleAndImageIfNoContent(
+                with: NSLocalizedString(.localeKeys.statisticNothing, comment: ""),
+                label: noContentLabel,
+                imageView: noContentImageView,
+                image: .noStatistic
+            )
+        } else {
+            setupTrackersDoneView()
+        }
+        
+        viewModel.$recordCount.bind(action: { [weak self] recordCount in
+            guard let self = self else { return }
+            if recordCount != 0 {
+                self.removeNoContent()
+                self.setupTrackersDoneView()
+                self.trackersDoneCountLabel.text = "\(recordCount)"
+            } else {
+                self.setupTitleAndImageIfNoContent(
+                    with: NSLocalizedString(.localeKeys.statisticNothing, comment: ""),
+                    label: self.noContentLabel,
+                    imageView: self.noContentImageView,
+                    image: .noStatistic
+                )
+                self.trackersDoneView.removeFromSuperview()
+            }
         })
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         trackersDoneView.layer.borderColor = makeGradientColor().cgColor
+    }
+    
+    private func removeNoContent() {
+        noContentLabel.removeFromSuperview()
+        noContentImageView.removeFromSuperview()
     }
 }
 

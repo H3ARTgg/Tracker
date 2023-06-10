@@ -6,6 +6,7 @@ extension UIImage {
     static let xMark = UIImage(systemName: "xmark.circle.fill") ?? UIImage()
     static let noTrackers = UIImage(named: Constants.noTrackersImage) ?? UIImage()
     static let noResult = UIImage(named: Constants.noResultImage) ?? UIImage()
+    static let noStatistic = UIImage(named: "no_statistic") ?? UIImage()
     static let plusForButton = UIImage(named: Constants.plusBarItem) ?? UIImage()
     static let doneCheckmark = UIImage(named: "done_checkmark") ?? UIImage()
     static let minusForButton = UIImage(systemName: "minus") ?? UIImage()
