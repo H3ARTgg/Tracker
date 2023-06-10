@@ -4,9 +4,9 @@ extension HabitOrEventViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if section == 0 {
             return String.emojisArray.count
+        } else {
+            return UIColor.selectionColors.count
         }
-        
-        return UIColor.selectionColors.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -51,7 +51,6 @@ extension HabitOrEventViewController: UICollectionViewDataSource {
         } else {
             view.titleLabel.text = NSLocalizedString(.localeKeys.color, comment: "Header for colors")
         }
-        
         return view
     }
 }

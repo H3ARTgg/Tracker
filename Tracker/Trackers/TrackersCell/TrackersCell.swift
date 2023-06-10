@@ -2,6 +2,7 @@ import UIKit
 import Foundation
 
 final class TrackersCell: UICollectionViewCell {
+    private let pinImageView = UIImageView()
     private let daysLabel = UILabel()
     private let cardEmojiPlaceholder = UIView()
     private let cardView = UIView()
@@ -37,6 +38,7 @@ final class TrackersCell: UICollectionViewCell {
             cardText.text = viewModel.name
             cardEmoji.text = viewModel.emoji
             viewModel.isRecordExists ? setDone() : setNotDone()
+            viewModel.isPinned ? pin() : unpin()
             if viewModel.isDateBiggerThanRealTime() {
                 daysButton.isUserInteractionEnabled = false
             } else {
@@ -79,6 +81,24 @@ final class TrackersCell: UICollectionViewCell {
             return IndexPath(row: 0, section: 0)
         }
         return superView.indexPath(for: self) ?? IndexPath(row: 0, section: 0)
+    }
+    
+    /// Добавляет значок закрепления
+    private func pin() {
+        pinImageView.image = .pinImage
+        pinImageView.translatesAutoresizingMaskIntoConstraints = false
+        
+        cardView.addSubview(pinImageView)
+        
+        NSLayoutConstraint.activate([
+            pinImageView.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -12),
+            pinImageView.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 18)
+        ])
+    }
+    
+    /// Убирает значок закрепления
+    private func unpin() {
+        pinImageView.removeFromSuperview()
     }
 }
 

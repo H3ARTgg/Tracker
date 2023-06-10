@@ -227,11 +227,11 @@ extension TrackersViewController: UIContextMenuInteractionDelegate {
             identifier: nil,
             previewProvider: nil) { actions in
                 let pinAction = UIAction(title: NSLocalizedString(.localeKeys.pin, comment: "")) { _ in
-                    viewModel.pin(cell)
+                    viewModel.pin(cell.viewModel.id)
                 }
                 
                 let unpinAction = UIAction(title: NSLocalizedString(.localeKeys.unpin, comment: "")) { _ in
-                    viewModel.unpin(cell)
+                    viewModel.unpin(cell.viewModel.id)
                 }
                 
                 let editAction = UIAction(title: NSLocalizedString(.localeKeys.edit, comment: "")) { [weak self] _ in
@@ -239,10 +239,10 @@ extension TrackersViewController: UIContextMenuInteractionDelegate {
                 }
                 
                 let deleteAction = UIAction(title: NSLocalizedString(.localeKeys.delete, comment: ""), attributes: .destructive) { [weak self] _ in
-                    self?.setupDeleteConfirmation(cell)
+                    self?.setupDeleteConfirmation(cell.viewModel.id)
                 }
                 
-                if viewModel.isPinned(cell) {
+                if viewModel.isPinned(cell.viewModel.id) {
                     return UIMenu(title: "", children: [unpinAction, editAction, deleteAction])
                 } else {
                     return UIMenu(title: "", children: [pinAction, editAction, deleteAction])
@@ -354,10 +354,10 @@ extension TrackersViewController {
         ])
     }
     
-    private func setupDeleteConfirmation(_ cell: TrackersCell) {
+    private func setupDeleteConfirmation(_ trackerId: UUID) {
         let alert = UIAlertController(title: "", message: NSLocalizedString(.localeKeys.deleteConfirmation, comment: ""), preferredStyle: .actionSheet)
         let deleteAction = UIAlertAction(title: NSLocalizedString(.localeKeys.delete, comment: ""), style: .destructive) { [weak self] _ in
-            self?.viewModel?.delete(cell)
+            self?.viewModel?.delete(trackerId)
         }
         let cancelAction = UIAlertAction(title: NSLocalizedString(.localeKeys.cancel, comment: ""), style: .cancel) { _ in
             alert.dismiss(animated: true)

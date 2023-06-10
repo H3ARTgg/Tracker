@@ -13,6 +13,7 @@ final class HabitOrEventSupplementaryView: UICollectionReusableView {
         
         NSLayoutConstraint.activate([
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 37),
             titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24)
         ])

@@ -41,6 +41,7 @@ final class TrackersViewModel: NewTrackerDelegate {
                     )
                 let recordCount = trackerRecordStore
                     .recordsCountFor(trackerID: tracker.id ?? UUID())
+                let isPinned = category.title == NSLocalizedString(.localeKeys.pinned, comment: "") ? true : false
                 let trackersCellViewModelSample = TrackersCellViewModelSample(
                     id: tracker.id ?? UUID(),
                     color: ColorMarshalling.color(from: tracker.colorHex ?? ""),
@@ -50,7 +51,8 @@ final class TrackersViewModel: NewTrackerDelegate {
                     isRecordExists: isRecordExists,
                     currentDate: currentDate,
                     delegate: self,
-                    rowNumber: rowNumber
+                    rowNumber: rowNumber,
+                    isPinned: isPinned
                 )
                 sameCategoryTrackers.append(
                     TrackersCellViewModel(cellSample: trackersCellViewModelSample)
@@ -107,9 +109,9 @@ final class TrackersViewModel: NewTrackerDelegate {
         return NewTrackerViewModel(delegate: self)
     }
     
-    /// Закрепляет ячейку
-    func pin(_ cell: TrackersCell) {
-        let cdTracker = try! trackerStore.getCDTracker(cell.viewModel.id)
+    /// Закрепляет трекер
+    func pin(_ trackerId: UUID) {
+        let cdTracker = try! trackerStore.getCDTracker(trackerId)
         
         let isPinnedCategoryExists = trackerCategoryStore.checkForExisting(categoryTitle: pinnedTitle)
         if isPinnedCategoryExists {
@@ -124,29 +126,28 @@ final class TrackersViewModel: NewTrackerDelegate {
         showTrackersFor(date: currentDate, search: "")
     }
     
-    /// Открепляет ячейку
-    func unpin(_ cell: TrackersCell) {
-        let cdTracker = try! trackerStore.getCDTracker(cell.viewModel.id)
+    /// Открепляет трекер
+    func unpin(_ trackerId: UUID) {
+        let cdTracker = try! trackerStore.getCDTracker(trackerId)
         let cdCategory = try! trackerCategoryStore.getCDTrackerCategoryFor(title: cdTracker.lastCategoryName ?? "")
-        
         try? trackerStore.updateExistingTrackerCategory(cdTracker, with: cdCategory)
         showTrackersFor(date: currentDate, search: "")
     }
     
-    /// Проверяет на закрепленность ячейки с возвратом булевой переменной
-    func isPinned(_ cell: TrackersCell) -> Bool {
+    /// Проверяет на закрепленность трекера с возвратом булевой переменной
+    func isPinned(_ trackerId: UUID) -> Bool {
         guard let pinnedCategory = trackersCategories.first(where: { [weak self] in
             $0.title == self?.pinnedTitle}) else {
             return false
         }
-        return pinnedCategory.trackers.contains { $0.id == cell.viewModel.id }
+        return pinnedCategory.trackers.contains { $0.id == trackerId }
     }
     
     /// Удаляет трекер
-    func delete(_ cell: TrackersCell) {
+    func delete(_ trackerId: UUID) {
         for category in trackersCategories {
-            if category.trackers.contains(where: { $0.id == cell.viewModel.id }) {
-                trackerStore.removeTracker(cell.viewModel.id, for: category.title)
+            if category.trackers.contains(where: { $0.id == trackerId }) {
+                trackerStore.removeTracker(trackerId, for: category.title)
                 break
             }
         }

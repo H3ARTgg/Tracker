@@ -10,6 +10,7 @@ extension UIImage {
     static let plusForButton = UIImage(named: Constants.plusBarItem) ?? UIImage()
     static let doneCheckmark = UIImage(named: "done_checkmark") ?? UIImage()
     static let minusForButton = UIImage(systemName: "minus") ?? UIImage()
+    static let pinImage = UIImage(named: "pin") ?? UIImage()
     
     func imageResized(to size: CGSize, color: UIColor? = .ypWhite) -> UIImage {
         let image = UIGraphicsImageRenderer(size: size).image { _ in

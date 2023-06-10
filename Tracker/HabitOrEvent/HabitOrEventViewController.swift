@@ -64,8 +64,12 @@ final class HabitOrEventViewController: UIViewController {
     private func didTapCreate() {
         viewModel?.didTapCreateButton(text: textField.text)
         weak var presentingVC = self.presentingViewController
-        dismiss(animated: true)
-        presentingVC?.dismiss(animated: true)
+        if case .edit(_) = viewModel?.choice {
+            dismiss(animated: true)
+        } else {
+            dismiss(animated: true)
+            presentingVC?.dismiss(animated: true)
+        }
     }
     
     @objc

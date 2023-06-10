@@ -27,7 +27,7 @@ extension HabitOrEventViewController: UICollectionViewDelegateFlowLayout {
         return headerView
             .systemLayoutSizeFitting(
                 CGSize(
-                    width: collectionView.frame.width,
+                    width: collectionView.bounds.width,
                     height: UIView.layoutFittingExpandedSize.height
                 ),
                 withHorizontalFittingPriority: .required,
