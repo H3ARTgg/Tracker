@@ -49,7 +49,9 @@ final class StatisticViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        trackersDoneView.layer.borderColor = makeGradientColor().cgColor
+        trackersDoneView.layer.borderColor = UIColor
+            .makeGradient(with: trackersDoneView.bounds)
+            .cgColor
     }
     
     private func removeNoContent() {
@@ -60,16 +62,6 @@ final class StatisticViewController: UIViewController {
 
 // MARK: - Views
 extension StatisticViewController {
-    private func makeGradientColor() -> UIColor {
-        let color1 = CGColor(red: 0/255, green: 123/255, blue: 250/255, alpha: 1)
-        let color2 = CGColor(red: 70/255, green: 230/255, blue: 157/255, alpha: 1)
-        let color3 = CGColor(red: 253/255, green: 76/255, blue: 73/255, alpha: 1)
-        let colors = [color3, color2, color1]
-        let locations: [NSNumber] = [0.2, 0.5, 1.0]
-        let gradient = UIImage.gradientImage(bounds: trackersDoneView.bounds, colors: colors, locations: locations)
-        return UIColor(patternImage: gradient)
-    }
-    
     private func setupHeaderLabel() {
         headerLabel.text = NSLocalizedString(.localeKeys.statistic, comment: "Statistic header")
         headerLabel.font = UIFont.systemFont(ofSize: 34, weight: .bold)

@@ -35,4 +35,15 @@ extension UIColor {
     static let selection18 = UIColor(named: "Color selection 18")
     
     static let selectionColors = [selection1, selection2, selection3, selection4, selection5, selection6, selection7, selection8, selection9, selection10, selection11, selection12, selection13, selection14, selection15, selection16, selection17, selection18]
+    
+    /// Создание определенного градиента
+    static func makeGradient(with bounds: CGRect) -> UIColor {
+        let color1 = CGColor(red: 0/255, green: 123/255, blue: 250/255, alpha: 1)
+        let color2 = CGColor(red: 70/255, green: 230/255, blue: 157/255, alpha: 1)
+        let color3 = CGColor(red: 253/255, green: 76/255, blue: 73/255, alpha: 1)
+        let colors = [color3, color2, color1]
+        let locations: [NSNumber] = [0.2, 0.5, 1.0]
+        let gradient = UIImage.gradientImage(bounds: bounds, colors: colors, locations: locations)
+        return UIColor(patternImage: gradient)
+    }
 }

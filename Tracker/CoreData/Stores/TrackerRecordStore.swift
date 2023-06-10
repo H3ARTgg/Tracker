@@ -5,9 +5,12 @@ protocol TrackerRecordStoreProtocol: AnyObject {
     func addTrackerRecord(_ trackerRecord: TrackerRecord) throws
     func deleteTrackerRecord(_ trackerRecord: TrackerRecord, for date: Date) throws
     func recordsCountFor(trackerID: UUID) -> Int
-    func recordsCountForAll() -> Int
     func isRecordExistsFor(trackerID: UUID, and date: Date) -> Bool
     func getAllTrackerRecordsFor( _ trackerID: UUID) -> [TrackerRecord]
+}
+
+protocol StatisticRecordsProvider {
+    func recordsCountForAll() -> Int
 }
 
 final class TrackerRecordStore: TrackerRecordStoreProtocol {
@@ -55,13 +58,6 @@ final class TrackerRecordStore: TrackerRecordStoreProtocol {
         return records != nil ? records!.count : 0
     }
     
-    /// Возвращает количество выполненных дней для всех трекеров
-    func recordsCountForAll() -> Int {
-        let request = NSFetchRequest<CDTrackerRecord>(entityName: "CDTrackerRecord")
-        let records = try? context.fetch(request)
-        return records != nil ? records!.count : 0
-    }
-    
     /// Возвращает массив TrackerRecord для конкретного UUID трекера
     func getAllTrackerRecordsFor( _ trackerID: UUID) -> [TrackerRecord] {
         let request = NSFetchRequest<CDTrackerRecord>(entityName: "CDTrackerRecord")
@@ -93,5 +89,14 @@ final class TrackerRecordStore: TrackerRecordStoreProtocol {
             })
         }
         return check
+    }
+}
+
+extension TrackerRecordStore: StatisticRecordsProvider {
+    /// Возвращает количество выполненных дней для всех трекеров
+    func recordsCountForAll() -> Int {
+        let request = NSFetchRequest<CDTrackerRecord>(entityName: "CDTrackerRecord")
+        let records = try? context.fetch(request)
+        return records != nil ? records!.count : 0
     }
 }

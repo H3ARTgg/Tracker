@@ -1,17 +1,17 @@
 final class StatisticViewModel {
     @Observable private(set) var recordCount: Int = 0
-    let trackerRecordStore: TrackerRecordStoreProtocol?
+    let statisticRecords: StatisticRecordsProvider?
     
-    init(trackerRecordStore: TrackerRecordStoreProtocol) {
-        self.trackerRecordStore = trackerRecordStore
-        self.recordCount = trackerRecordStore.recordsCountForAll()
+    init(statisticRecords: StatisticRecordsProvider) {
+        self.statisticRecords = statisticRecords
+        self.recordCount = statisticRecords.recordsCountForAll()
     }
 }
 
 extension StatisticViewModel: TrackersViewModelDelegate {
     func updateCompletedTrackers() {
-        if let trackerRecordStore {
-            recordCount = trackerRecordStore.recordsCountForAll()
+        if let statisticRecords {
+            recordCount = statisticRecords.recordsCountForAll()
         }
     }
 }

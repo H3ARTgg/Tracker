@@ -17,7 +17,7 @@ final class TabBarViewModel {
             analyticsService: analyticsService
         )
         
-        let statisticViewModel = StatisticViewModel(trackerRecordStore: trackerRecordStore)
+        let statisticViewModel = StatisticViewModel(statisticRecords: trackerRecordStore)
         trackersViewModel.delegate = statisticViewModel
         return [trackersViewModel, statisticViewModel]
     }
