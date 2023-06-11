@@ -1,4 +1,5 @@
 final class LocaleKeys {
+    static let shared = LocaleKeys()
     // Titles
     let categoryNew = "category.new"
     let habitNew = "habit.new"
@@ -58,8 +59,10 @@ final class LocaleKeys {
     let sundayLong = "sunday.long"
     let sundayShort = "sunday.short"
     let everyDay = "everyday"
+    
+    private init() {}
 }
 
 extension String {
-    static let localeKeys = LocaleKeys()
+    static let localeKeys = LocaleKeys.shared
 }
