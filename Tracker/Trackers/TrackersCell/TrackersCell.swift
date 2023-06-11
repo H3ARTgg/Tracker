@@ -2,6 +2,7 @@ import UIKit
 import Foundation
 
 final class TrackersCell: UICollectionViewCell {
+    private let pinImageView = UIImageView()
     private let daysLabel = UILabel()
     private let cardEmojiPlaceholder = UIView()
     private let cardView = UIView()
@@ -37,6 +38,7 @@ final class TrackersCell: UICollectionViewCell {
             cardText.text = viewModel.name
             cardEmoji.text = viewModel.emoji
             viewModel.isRecordExists ? setDone() : setNotDone()
+            viewModel.isPinned ? pin() : unpin()
             if viewModel.isDateBiggerThanRealTime() {
                 daysButton.isUserInteractionEnabled = false
             } else {
@@ -44,6 +46,7 @@ final class TrackersCell: UICollectionViewCell {
             }
         }
     }
+    var interactionDelegate: UIContextMenuInteractionDelegate?
     
     @objc
     private func addDay() {
@@ -79,14 +82,37 @@ final class TrackersCell: UICollectionViewCell {
         }
         return superView.indexPath(for: self) ?? IndexPath(row: 0, section: 0)
     }
+    
+    /// Добавляет значок закрепления
+    private func pin() {
+        pinImageView.image = .pinImage
+        pinImageView.translatesAutoresizingMaskIntoConstraints = false
+        
+        cardView.addSubview(pinImageView)
+        
+        NSLayoutConstraint.activate([
+            pinImageView.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -12),
+            pinImageView.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 18)
+        ])
+    }
+    
+    /// Убирает значок закрепления
+    private func unpin() {
+        pinImageView.removeFromSuperview()
+    }
 }
 
 // MARK: - Views
 extension TrackersCell {
     private func setupCardViewFor(rowNumber: Int) {
-        cardView.makeCornerRadius(16)
+        // Пришлось поставить 12, а не 16, так как ContextMenu показывается с другим CornerRadius
+        cardView.makeCornerRadius(12)
         cardView.backgroundColor = selectionColor
         cardView.translatesAutoresizingMaskIntoConstraints = false
+        if let interactionDelegate = self.interactionDelegate {
+            let interaction = UIContextMenuInteraction(delegate: interactionDelegate)
+            cardView.addInteraction(interaction)
+        }
         addSubview(cardView)
         /*
          Если выставлять trailing и leading = 16 у collectionView, то скролл индикатор налазит на ячейки, в таком случае нужно менять констрейнты trailing и leading у ячейки, но..
@@ -131,7 +157,7 @@ extension TrackersCell {
     
     private func setupCardEmoji() {
         cardEmoji.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(cardEmoji)
+        cardView.addSubview(cardEmoji)
         cardEmoji.font = .systemFont(ofSize: 13)
         
         NSLayoutConstraint.activate([
@@ -177,7 +203,6 @@ extension TrackersCell {
     
     private func setupDaysLabel() {
         daysLabel.numberOfLines = 1
-        daysLabel.text = "0 дней"
         daysLabel.translatesAutoresizingMaskIntoConstraints = false
         daysLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         daysLabel.textColor = .ypBlack

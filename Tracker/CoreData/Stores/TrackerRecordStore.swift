@@ -3,9 +3,15 @@ import UIKit
 
 protocol TrackerRecordStoreProtocol: AnyObject {
     func addTrackerRecord(_ trackerRecord: TrackerRecord) throws
-    func deleteTrackerRecord(_ trackerRecord: TrackerRecord, for date: Date) throws
+    func removeTrackerRecord(_ trackerRecord: TrackerRecord, for date: Date) throws
+    func removeAllTrackerRecords(for trackerId: UUID) throws
     func recordsCountFor(trackerID: UUID) -> Int
     func isRecordExistsFor(trackerID: UUID, and date: Date) -> Bool
+    func getAllTrackerRecordsFor( _ trackerID: UUID) -> [TrackerRecord]
+}
+
+protocol StatisticRecordsProvider {
+    func recordsCountForAll() -> Int
 }
 
 final class TrackerRecordStore: TrackerRecordStoreProtocol {
@@ -34,7 +40,7 @@ final class TrackerRecordStore: TrackerRecordStoreProtocol {
     }
     
     /// Удаляет выполненный день
-    func deleteTrackerRecord(_ trackerRecord: TrackerRecord, for date: Date) throws {
+    func removeTrackerRecord(_ trackerRecord: TrackerRecord, for date: Date) throws {
         let request = NSFetchRequest<CDTrackerRecord>(entityName: "CDTrackerRecord")
         request.predicate = NSPredicate(format: "%K == %@", "id", trackerRecord.id as CVarArg)
         let cdTrackerRecords = try context.fetch(request)
@@ -45,12 +51,38 @@ final class TrackerRecordStore: TrackerRecordStoreProtocol {
         try context.save()
     }
     
+    func removeAllTrackerRecords(for trackerId: UUID) throws {
+        let request = NSFetchRequest<CDTrackerRecord>(entityName: "CDTrackerRecord")
+        request.predicate = NSPredicate(format: "%K == %@", "id", trackerId as CVarArg)
+        let cdTrackerRecords = try context.fetch(request)
+        cdTrackerRecords.forEach { [weak self] in
+            self?.context.delete($0)
+        }
+    }
+    
     /// Возвращает количество выполненных дней трекера
     func recordsCountFor(trackerID: UUID) -> Int {
         let request = NSFetchRequest<CDTrackerRecord>(entityName: "CDTrackerRecord")
         request.predicate = NSPredicate(format: "%K == %@", "id", trackerID as CVarArg)
         let records = try? context.fetch(request)
         return records != nil ? records!.count : 0
+    }
+    
+    /// Возвращает массив TrackerRecord для конкретного UUID трекера
+    func getAllTrackerRecordsFor( _ trackerID: UUID) -> [TrackerRecord] {
+        let request = NSFetchRequest<CDTrackerRecord>(entityName: "CDTrackerRecord")
+        request.predicate = NSPredicate(format: "%K == %@", "id", trackerID as CVarArg)
+        let records = try? context.fetch(request)
+        var trackerRecords: [TrackerRecord] = []
+        records?.forEach({
+            guard let id = $0.id, let date = $0.date else { return }
+            let trackerRecord = TrackerRecord(
+                id: id,
+                date: date
+            )
+            trackerRecords.append(trackerRecord)
+        })
+        return trackerRecords.sorted { $0.date < $1.date }
     }
     
     /// Проверяет, выполнен ли трекер для данного дня
@@ -67,5 +99,14 @@ final class TrackerRecordStore: TrackerRecordStoreProtocol {
             })
         }
         return check
+    }
+}
+
+extension TrackerRecordStore: StatisticRecordsProvider {
+    /// Возвращает количество выполненных дней для всех трекеров
+    func recordsCountForAll() -> Int {
+        let request = NSFetchRequest<CDTrackerRecord>(entityName: "CDTrackerRecord")
+        let records = try? context.fetch(request)
+        return records != nil ? records!.count : 0
     }
 }

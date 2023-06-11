@@ -11,6 +11,7 @@ struct TrackersCellViewModelSample {
     let currentDate: Date
     let delegate: TrackersCellDelegate
     let rowNumber: Int
+    let isPinned: Bool
 }
 
 final class TrackersCellViewModel: Identifiable {
@@ -22,10 +23,13 @@ final class TrackersCellViewModel: Identifiable {
     let emoji: String
     let isRecordExists: Bool
     let rowNumber: Int
+    let isPinned: Bool
     
     private(set) var recordCount: Int {
         didSet {
-            daysRecordText = DaysOfTheWeek.getRightTextDeclinationFor(recordCount: recordCount)
+            daysRecordText = String.localizedStringWithFormat(
+                NSLocalizedString(.localeKeys.numberOfDays, comment: ""),
+                recordCount)
         }
     }
     @Observable private(set) var daysRecordText: String = "0 дней"
@@ -40,7 +44,10 @@ final class TrackersCellViewModel: Identifiable {
         self.currentDate = cellSample.currentDate
         self.delegate = cellSample.delegate
         self.rowNumber = cellSample.rowNumber
-        self.daysRecordText = DaysOfTheWeek.getRightTextDeclinationFor(recordCount: recordCount)
+        self.isPinned = cellSample.isPinned
+        self.daysRecordText = String.localizedStringWithFormat(
+            NSLocalizedString(.localeKeys.numberOfDays, comment: ""),
+            recordCount)
     }
     
     func isDateBiggerThanRealTime() -> Bool {

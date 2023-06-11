@@ -1,4 +1,5 @@
 struct Constants {
+    static let apiKeyMetrica = ""
     static let trackerListBarItem = "trackerlist_bar_item"
     static let statisticBarItem = "statistic_bar_item"
     static let plusBarItem = "plus_bar_item"

@@ -8,9 +8,25 @@ final class TrackersViewController: UIViewController {
     private let searchField = UISearchTextField()
     private var searchCancelButton = UIButton()
     private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    private lazy var filterButton: UIButton = {
+        let button = UIButton.systemButton(with: .xMark, target: self, action: #selector(didTapFilterButton))
+        button.setImage(nil, for: .normal)
+        button.setTitle(NSLocalizedString(.localeKeys.filters, comment: ""), for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = .ypBlue
+        button.makeCornerRadius(16)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
     private var searchText: String = ""
     private var currentDate: Date = Date()
     var viewModel: TrackersViewModel?
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        viewModel?.report(event: .open, screen: .trackersList, item: nil)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,6 +44,11 @@ final class TrackersViewController: UIViewController {
         })
         
         isNeedToSetupNoContentUI()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        viewModel?.report(event: .close, screen: .trackersList, item: nil)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -69,19 +90,37 @@ final class TrackersViewController: UIViewController {
         viewModel?.showTrackersFor(date: currentDate, search: searchText)
     }
     
+    @objc
+    private func didTapFilterButton() {
+        viewModel?.report(event: .click, screen: .trackersList, item: .filter)
+    }
+    
+    private func presentEditorFor(with trackerId: UUID) {
+        resetSearchField()
+        let habitOrEventVC = HabitOrEventViewController()
+        habitOrEventVC.viewModel = viewModel?
+            .getHabitOrEventViewModel(with: trackerId)
+        habitOrEventVC.modalPresentationStyle = .popover
+        viewModel?.report(event: .click, screen: .trackersList, item: .edit)
+        present(habitOrEventVC, animated: true)
+    }
+    
     /// Проверяет, нужно ли добавлять no content UI или нет.
     /// Для поиска выводит другой no content UI
     private func isNeedToSetupNoContentUI() {
         if view.subviews.contains(noContentLabel) {
             removeNoContent()
+            setupFilterButtonLayout()
         }
         
         if viewModel?.trackersCategories.count == 0 {
-            setupTitleAndImageIfNoContent(with: "Что будем отслеживать?", label: noContentLabel, imageView: noContentImageView, image: .noTrackers)
+            setupTitleAndImageIfNoContent(with: NSLocalizedString(.localeKeys.emptyStateTitle, comment: "Empty state title"), label: noContentLabel, imageView: noContentImageView, image: .noTrackers)
+            filterButton.removeFromSuperview()
         }
         
         if viewModel?.trackersCategories.count == 0 && searchField.isEditing {
-            setupTitleAndImageIfNoContent(with: "Ничего не найдено", label: noContentLabel, imageView: noContentImageView, image: UIImage(named: Constants.noResultImage)!)
+            setupTitleAndImageIfNoContent(with: NSLocalizedString(.localeKeys.searchEmptyTitle, comment: "Search empty title"), label: noContentLabel, imageView: noContentImageView, image: UIImage(named: Constants.noResultImage)!)
+            filterButton.removeFromSuperview()
         }
         
     }
@@ -152,7 +191,7 @@ extension TrackersViewController: UICollectionViewDataSource {
             return UICollectionViewCell(frame: .zero)
         }
         
-        viewModel?.configure(cell, for: indexPath)
+        viewModel?.configure(cell, for: indexPath, interactionDelegate: self)
         
         return cell
     }
@@ -203,10 +242,49 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
+// MARK: - UIContextMenuInteractionDelegate
+extension TrackersViewController: UIContextMenuInteractionDelegate {
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        guard
+            let viewModel = viewModel,
+            let location = interaction.view?.convert(location, to: collectionView),
+            let indexPath = collectionView.indexPathForItem(at: location),
+            let cell = collectionView.cellForItem(at: indexPath) as? TrackersCell else {
+            return nil
+        }
+        
+        return UIContextMenuConfiguration(
+            identifier: nil,
+            previewProvider: nil) { actions in
+                let pinAction = UIAction(title: NSLocalizedString(.localeKeys.pin, comment: "")) { _ in
+                    viewModel.pin(cell.viewModel.id)
+                }
+                
+                let unpinAction = UIAction(title: NSLocalizedString(.localeKeys.unpin, comment: "")) { _ in
+                    viewModel.unpin(cell.viewModel.id)
+                }
+                
+                let editAction = UIAction(title: NSLocalizedString(.localeKeys.edit, comment: "")) { [weak self] _ in
+                    self?.presentEditorFor(with: cell.viewModel.id)
+                }
+                
+                let deleteAction = UIAction(title: NSLocalizedString(.localeKeys.delete, comment: ""), attributes: .destructive) { [weak self] _ in
+                    self?.setupDeleteConfirmation(cell.viewModel.id)
+                }
+                
+                if viewModel.isPinned(cell.viewModel.id) {
+                    return UIMenu(title: "", children: [unpinAction, editAction, deleteAction])
+                } else {
+                    return UIMenu(title: "", children: [pinAction, editAction, deleteAction])
+                }
+            }
+    }
+}
+
 // MARK: - Views Setup
 extension TrackersViewController {
     private func setupHeaderLabel() {
-        headerLabel.text = "Трекеры"
+        headerLabel.text = NSLocalizedString(.localeKeys.trackers, comment: "Trackers header")
         headerLabel.font = UIFont.systemFont(ofSize: 34, weight: .bold)
         headerLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(headerLabel)
@@ -229,7 +307,6 @@ extension TrackersViewController {
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .compact
         datePicker.makeCornerRadius(8)
-        datePicker.locale = Locale(identifier: "ru")
         datePicker.addTarget(self, action: #selector(didDateChanged), for: .valueChanged)
         view.addSubview(datePicker)
         
@@ -242,7 +319,7 @@ extension TrackersViewController {
     }
     
     private func setupSearchFieldFor(searchCancel: Bool) {
-        searchField.placeholder = "Поиск"
+        searchField.placeholder = NSLocalizedString(.localeKeys.search, comment: "Search placeholder")
         searchField.backgroundColor = .searchFieldColor
         searchField.tintColor = .ypBlack
         searchField.translatesAutoresizingMaskIntoConstraints = false
@@ -291,7 +368,7 @@ extension TrackersViewController {
         searchCancelButton = .systemButton(with: .xMark, target: self, action: #selector(didTapCancelSearchButton))
         
         searchCancelButton.setImage(nil, for: .normal)
-        searchCancelButton.setTitle("Отменить", for: .normal)
+        searchCancelButton.setTitle(NSLocalizedString(.localeKeys.cancel, comment: "Search cancel"), for: .normal)
         searchCancelButton.setTitleColor(.ypBlue, for: .normal)
         searchCancelButton.translatesAutoresizingMaskIntoConstraints = false
         
@@ -303,6 +380,30 @@ extension TrackersViewController {
         NSLayoutConstraint.activate([
             searchCancelButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             searchCancelButton.centerYAnchor.constraint(equalTo: searchField.centerYAnchor)
+        ])
+    }
+    
+    private func setupDeleteConfirmation(_ trackerId: UUID) {
+        let alert = UIAlertController(title: "", message: NSLocalizedString(.localeKeys.deleteConfirmation, comment: ""), preferredStyle: .actionSheet)
+        let deleteAction = UIAlertAction(title: NSLocalizedString(.localeKeys.delete, comment: ""), style: .destructive) { [weak self] _ in
+            self?.viewModel?.delete(trackerId)
+        }
+        let cancelAction = UIAlertAction(title: NSLocalizedString(.localeKeys.cancel, comment: ""), style: .cancel)
+        
+        alert.addAction(cancelAction)
+        alert.addAction(deleteAction)
+        present(alert, animated: true)
+    }
+    
+    private func setupFilterButtonLayout() {
+        view.addSubview(filterButton)
+        
+        NSLayoutConstraint.activate([
+            filterButton.heightAnchor.constraint(equalToConstant: 50),
+            filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -17),
+            filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            filterButton.leadingAnchor.constraint(lessThanOrEqualTo: view.leadingAnchor, constant: 150),
+            filterButton.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -150)
         ])
     }
 }

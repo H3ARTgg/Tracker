@@ -25,7 +25,7 @@ extension HabitOrEventViewController: UITableViewDelegate {
         let scheduleVC = ScheduleViewController()
         scheduleVC.modalPresentationStyle = .popover
         scheduleVC.delegate = viewModel
-        scheduleVC.recieveDaysOfTheWeek(daysOfTheWeek: viewModel?.daysOfTheWeek ?? [0 : WeekDay(weekDay: 0)])
+        scheduleVC.recieveDaysOfTheWeek(daysOfTheWeek: viewModel?.daysOfTheWeek ?? [])
         textField.resignFirstResponder()
         present(scheduleVC, animated: true)
     }

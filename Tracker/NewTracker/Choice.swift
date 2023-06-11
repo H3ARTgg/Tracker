@@ -1,4 +1,5 @@
-enum Choice: String {
-    case habit = "Новая привычка"
-    case event = "Новое нерегулярное событие"
+enum Choice {
+    case habit
+    case event
+    indirect case edit(Choice)
 }

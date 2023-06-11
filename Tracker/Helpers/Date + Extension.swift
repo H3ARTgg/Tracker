@@ -1,6 +1,16 @@
 import Foundation
 
 extension Date {
+    func createDay(day: Int, month: Int, year: Int) -> Date {
+        var dateComponents = DateComponents()
+        dateComponents.year = year
+        dateComponents.month = month
+        dateComponents.day = day
+        
+        let userCalendar = Calendar.current
+        return userCalendar.date(from: dateComponents) ?? Date()
+    }
+    
     func fullDistance(from date: Date, resultIn component: Calendar.Component, calendar: Calendar = .current) -> Int? {
         calendar.dateComponents([component], from: self, to: date).value(for: component)
     }
@@ -26,6 +36,18 @@ extension Date {
             results.append(distance(from: Date(), only: component) > 0)
         }
         return results.contains(true) ? true : false
+    }
+    
+    func day() -> Int {
+        Calendar.current.component(.day, from: self)
+    }
+    
+    func month() -> Int {
+        Calendar.current.component(.month, from: self)
+    }
+    
+    func year() -> Int {
+        Calendar.current.component(.year, from: self)
     }
     
     /// Get weekday of date.

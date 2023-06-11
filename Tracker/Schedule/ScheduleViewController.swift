@@ -7,15 +7,14 @@ final class ScheduleViewController: UIViewController {
     private var doneButton = UIButton()
     private let scrollView = UIScrollView()
     private let contentView = UIView()
-    private let daysOfTheWeekStrings = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
-    private var daysOfTheWeek: [Int: WeekDay] = [:]
+    private var daysOfTheWeek: [WeekDay] = []
     weak var delegate: ScheduleViewControllerDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
         setupScrollViewAndContentView(scrollView: scrollView, contentView: contentView)
-        setupTitleLabel(with: "Расписание")
+        setupTitleLabel(with: NSLocalizedString(.localeKeys.schedule, comment: "Schedule title"))
         setupTableView()
         setupDoneButton()
     }
@@ -29,60 +28,33 @@ final class ScheduleViewController: UIViewController {
     
     @objc
     private func didTapDoneButton() {
-        delegate?.didRecieveDaysOfTheWeek(daysOfTheWeek: self.daysOfTheWeek)
+        delegate?.didRecieveDaysOfTheWeek(daysOfTheWeek: self.daysOfTheWeek
+            .sorted(by: { $0.weekDay < $1.weekDay }))
         self.daysOfTheWeek.removeAll()
         dismiss(animated: true)
     }
 }
 
-// MARK: - ScheduleViewControllerProtocol
-
+// MARK: - ScheduleViewControllerProtocols
 extension ScheduleViewController: ScheduleViewControllerProtocol {
-    func recieveDaysOfTheWeek(daysOfTheWeek: [Int: WeekDay]) {
+    func recieveDaysOfTheWeek(daysOfTheWeek: [WeekDay]) {
         self.daysOfTheWeek = daysOfTheWeek
         tableView.reloadData()
     }
 }
 
 // MARK: - ScheduleCellDelegate
-
 extension ScheduleViewController: ScheduleCellDelegate {
-    func choiceForDay(_ check: Bool, indexPath: IndexPath) {
-        switch indexPath.row {
-        case 0:
-            addToArray(check, for: DaysOfTheWeek.monday.rawValue, with: indexPath)
-        case 1:
-            addToArray(check, for: DaysOfTheWeek.tuesday.rawValue, with: indexPath)
-        case 2:
-            addToArray(check, for: DaysOfTheWeek.wednesday.rawValue, with: indexPath)
-        case 3:
-            addToArray(check, for: DaysOfTheWeek.thursday.rawValue, with: indexPath)
-        case 4:
-            addToArray(check, for: DaysOfTheWeek.friday.rawValue, with: indexPath)
-        case 5:
-            addToArray(check, for: DaysOfTheWeek.saturday.rawValue, with: indexPath)
-        case 6:
-            addToArray(check, for: DaysOfTheWeek.sunday.rawValue, with: indexPath)
-        default:
-            assertionFailure("out of cases in choiceForDay")
-        }
-    }
-    
-    private func addToArray(_ check: Bool, for dayNumber: Int, with indexPath: IndexPath) {
-        if check {
-            daysOfTheWeek[indexPath.row] = WeekDay(weekDay: dayNumber)
+    func choiceForDay(_ isSwitherOn: Bool, indexPath: IndexPath) {
+        if isSwitherOn {
+            daysOfTheWeek.append(WeekDay(cellRow: indexPath.row))
         } else {
-            if daysOfTheWeek.contains(where: { dict in
-                dict.value.weekDay == dayNumber
-            }) {
-                daysOfTheWeek.removeValue(forKey: indexPath.row)
-            }
+            daysOfTheWeek.removeAll { $0.cellRow == indexPath.row }
         }
     }
 }
 
 // MARK: - TableViewDataSource
-
 extension ScheduleViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         7
@@ -93,19 +65,19 @@ extension ScheduleViewController: UITableViewDataSource {
             assertionFailure("No schedule cell")
             return UITableViewCell(frame: .zero)
         }
-        let daysKeys = daysOfTheWeek.sorted(by: { $0.key < $1.key }).map(\.key)
-        if daysKeys.contains(indexPath.row) {
+
+        if daysOfTheWeek.contains(where: { $0.cellRow == indexPath.row }) {
             cell.setOn(true)
         }
         cell.delegate = self
-        cell.setTitle(with: daysOfTheWeekStrings[indexPath.row])
+        let weekDay = WeekDay(cellRow: indexPath.row)
+        cell.setTitle(with: weekDay.longNameForCell)
         
         return cell
     }
 }
 
 // MARK: - TableViewDelegate
-
 extension ScheduleViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         75
@@ -139,7 +111,7 @@ extension ScheduleViewController {
     private func setupDoneButton() {
         doneButton = .systemButton(with: .chevronLeft, target: self, action: #selector(didTapDoneButton))
         doneButton.setImage(nil, for: .normal)
-        doneButton.setTitle("Готово", for: .normal)
+        doneButton.setTitle(NSLocalizedString(.localeKeys.done, comment: "Title for done button"), for: .normal)
         doneButton.setTitleColor(.ypWhite, for: .normal)
         doneButton.backgroundColor = .ypBlack
         doneButton.titleLabel?.textAlignment = .center

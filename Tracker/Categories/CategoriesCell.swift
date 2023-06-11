@@ -1,5 +1,6 @@
 import UIKit
 
+// TODO: Переделать под MVVM
 final class CategoriesCell: UITableViewCell {
     let title = UILabel()
     let imageViewForCheckmark = UIImageView()

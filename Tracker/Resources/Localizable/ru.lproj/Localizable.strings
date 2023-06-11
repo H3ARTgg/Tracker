@@ -1,0 +1,58 @@
+// Titles
+"category.new" = "Новая категория";
+"habit.new" = "Новая привычка";
+"event.new" = "Новое нерегулярное событие";
+"tracker.creation" = "Создание трекера";
+"habit.edit" = "Редактирование привычки";
+"event.edit" = "Редактирование нерегулярного события";
+
+// Empty States
+"emptyState.title" = "Что будем отслеживать?";
+"searchEmpty.title" = "Ничего не найдено";
+"categoryEmpty.title" = "Привычки и события можно объединить по смыслу";
+
+// Placeholders
+"type.category.name" = "Введите название категории";
+"type.tracker.title" = "Введите название трекера";
+
+// Other
+"statistic" = "Статистика";
+"category" = "Категория";
+"schedule" = "Расписание";
+"habit" = "Привычка";
+"event" = "Нерегулярное событие";
+"trackers" = "Трекеры";
+"search" = "Поиск";
+"warning" = "Ограничение 38 символов";
+"create" = "Создать";
+"cancel" = "Отменить";
+"emoji" = "Emoji";
+"color" = "Цвет";
+"category.add" = "Добавить категорию";
+"done" = "Готово";
+"pinned" = "Закрепленные";
+"pin" = "Закрепить";
+"unpin" = "Открепить";
+"edit" = "Редактировать";
+"delete" = "Удалить";
+"delete.confirmation" = "Уверены, что хотите удалить трекер?";
+"trackers.completed" = "Трекеров завершено";
+"statistic.nothing" = "Анализировать пока нечего";
+"filters" = "Фильтры";
+
+// Days of the week
+"monday.long" = "Понедельник";
+"monday.short" = "Пн";
+"tuesday.long" = "Вторник";
+"tuesday.short" = "Вт";
+"wednesday.long" = "Среда";
+"wednesday.short" = "Ср";
+"thursday.long" = "Четверг";
+"thursday.short" = "Чт";
+"friday.long" = "Пятница";
+"friday.short" = "Пт";
+"saturday.long" = "Суббота";
+"saturday.short" = "Сб";
+"sunday.long" = "Воскресенье";
+"sunday.short" = "Вс";
+"everyday" = "Каждый день";
