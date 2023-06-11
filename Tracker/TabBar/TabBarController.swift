@@ -14,8 +14,8 @@ final class TabBarController: UITabBarController {
         let trackerListVC = TrackersViewController()
         let statisticVC = StatisticViewController()
         let viewModels = viewModel?.getViewModels()
-        trackerListVC.viewModel = viewModels?[0] as? TrackersViewModel
-        statisticVC.viewModel = viewModels?[1] as? StatisticViewModel
+        trackerListVC.viewModel = viewModels?.0
+        statisticVC.viewModel = viewModels?.1
         
         let navigationVC = UINavigationController(rootViewController: trackerListVC)
         

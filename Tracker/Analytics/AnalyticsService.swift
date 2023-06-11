@@ -1,21 +1,31 @@
 import YandexMobileMetrica
 
 protocol AnalyticsServiceProtocol {
-    func reportWishToCreateTracker()
-    func reportTrackerDeletion()
+    func report(event: Event, screen: Screen, item: Item?)
+}
+
+enum Event: String {
+    case open, close, click
+}
+
+enum Screen: String {
+    case trackersList = "trackers_list"
+}
+
+enum Item: String {
+    case addTracker = "add_tracker"
+    case doneTracker = "done_tracker"
+    case filter, edit, delete
 }
 
 final class AnalyticsService: AnalyticsServiceProtocol {
-    func reportWishToCreateTracker() {
-        let params : [AnyHashable : Any] = ["add_count": 1]
-        YMMYandexMetrica.reportEvent("tap_add_tracker", parameters: params, onFailure: { error in
-            print("REPORT ERROR: %@", error.localizedDescription)
-        })
-    }
-    
-    func reportTrackerDeletion() {
-        let params : [AnyHashable : Any] = ["delete_count": 1]
-        YMMYandexMetrica.reportEvent("delete_tracker", parameters: params, onFailure: { error in
+    func report(event: Event, screen: Screen, item: Item?) {
+        var params: [AnyHashable: Any] = ["screen": screen.rawValue]
+        if event == .click, let item {
+            params["item"] = item.rawValue
+        }
+
+        YMMYandexMetrica.reportEvent(event.rawValue, parameters: params, onFailure: { error in
             print("REPORT ERROR: %@", error.localizedDescription)
         })
     }

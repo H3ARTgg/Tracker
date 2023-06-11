@@ -3,7 +3,8 @@ import UIKit
 
 protocol TrackerRecordStoreProtocol: AnyObject {
     func addTrackerRecord(_ trackerRecord: TrackerRecord) throws
-    func deleteTrackerRecord(_ trackerRecord: TrackerRecord, for date: Date) throws
+    func removeTrackerRecord(_ trackerRecord: TrackerRecord, for date: Date) throws
+    func removeAllTrackerRecords(for trackerId: UUID) throws
     func recordsCountFor(trackerID: UUID) -> Int
     func isRecordExistsFor(trackerID: UUID, and date: Date) -> Bool
     func getAllTrackerRecordsFor( _ trackerID: UUID) -> [TrackerRecord]
@@ -39,7 +40,7 @@ final class TrackerRecordStore: TrackerRecordStoreProtocol {
     }
     
     /// Удаляет выполненный день
-    func deleteTrackerRecord(_ trackerRecord: TrackerRecord, for date: Date) throws {
+    func removeTrackerRecord(_ trackerRecord: TrackerRecord, for date: Date) throws {
         let request = NSFetchRequest<CDTrackerRecord>(entityName: "CDTrackerRecord")
         request.predicate = NSPredicate(format: "%K == %@", "id", trackerRecord.id as CVarArg)
         let cdTrackerRecords = try context.fetch(request)
@@ -48,6 +49,15 @@ final class TrackerRecordStore: TrackerRecordStoreProtocol {
         }
         context.delete(filteredRecords[0])
         try context.save()
+    }
+    
+    func removeAllTrackerRecords(for trackerId: UUID) throws {
+        let request = NSFetchRequest<CDTrackerRecord>(entityName: "CDTrackerRecord")
+        request.predicate = NSPredicate(format: "%K == %@", "id", trackerId as CVarArg)
+        let cdTrackerRecords = try context.fetch(request)
+        cdTrackerRecords.forEach { [weak self] in
+            self?.context.delete($0)
+        }
     }
     
     /// Возвращает количество выполненных дней трекера

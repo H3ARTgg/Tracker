@@ -105,7 +105,7 @@ final class TrackersViewModel: NewTrackerDelegate {
     
     /// Возвращает ViewModel для NewTrackerViewController
     func getViewModelForNewTracker() -> NewTrackerViewModel {
-        analyticsService.reportWishToCreateTracker()
+        report(event: .click, screen: .trackersList, item: .addTracker)
         return NewTrackerViewModel(delegate: self)
     }
     
@@ -148,16 +148,21 @@ final class TrackersViewModel: NewTrackerDelegate {
         for category in trackersCategories {
             if category.trackers.contains(where: { $0.id == trackerId }) {
                 trackerStore.removeTracker(trackerId, for: category.title)
+                do {
+                    try trackerRecordStore.removeAllTrackerRecords(for: trackerId)
+                } catch {
+                    assertionFailure("Can't delete tracker records")
+                }
                 break
             }
         }
-        analyticsService.reportTrackerDeletion()
+        report(event: .click, screen: .trackersList, item: .delete)
         showTrackersFor(date: currentDate, search: "")
     }
     
     /// Узнать, какой выбор у ячейки (привычка или событие)
-    private func findOutChoiceFor(_ cell: TrackersCell) -> Choice {
-        let cdTracker = try! trackerStore.getCDTracker(cell.viewModel.id)
+    private func findOutChoiceFor(_ trackerId: UUID) -> Choice {
+        let cdTracker = try! trackerStore.getCDTracker(trackerId)
         if let weekDays = cdTracker.weekDays {
             if weekDays.count > 0 {
                 return .habit
@@ -167,9 +172,9 @@ final class TrackersViewModel: NewTrackerDelegate {
     }
     
     /// Возвращает HabitOrEventViewModel
-    func getHabitOrEventViewModel(with cell: TrackersCell) -> HabitOrEventViewModel {
-        let cdTracker = try! trackerStore.getCDTracker(cell.viewModel.id)
-        let choice = findOutChoiceFor(cell)
+    func getHabitOrEventViewModel(with trackerId: UUID) -> HabitOrEventViewModel {
+        let cdTracker = try! trackerStore.getCDTracker(trackerId)
+        let choice = findOutChoiceFor(trackerId)
         let tracker = Tracker(
             id: cdTracker.id ?? UUID(),
             name: cdTracker.name ?? "",
@@ -179,9 +184,13 @@ final class TrackersViewModel: NewTrackerDelegate {
             createdAt: cdTracker.createdAt ?? Date()
         )
         let trackerCategory = TrackerCategory(title: cdTracker.category?.title ?? "", trackers: [tracker], createdAt: Date())
-        let recordCount = trackerRecordStore.recordsCountFor(trackerID: cell.viewModel.id)
+        let recordCount = trackerRecordStore.recordsCountFor(trackerID: trackerId)
         let trackerEdit = TrackerEdit(recordCount: recordCount, trackerCategory: trackerCategory)
         return HabitOrEventViewModel(choice: .edit(choice), delegate: self, trackerEdit: trackerEdit)
+    }
+    
+    func report(event: Event, screen: Screen, item: Item?) {
+        analyticsService.report(event: event, screen: screen, item: item)
     }
 }
 
@@ -193,10 +202,11 @@ extension TrackersViewModel: TrackersCellDelegate {
             let newRecord = TrackerRecord(id: id, date: currentDate)
             try? trackerRecordStore.addTrackerRecord(newRecord)
         } else {
-            try? trackerRecordStore.deleteTrackerRecord(newRecord, for: currentDate)
+            try? trackerRecordStore.removeTrackerRecord(newRecord, for: currentDate)
         }
         
         delegate?.updateCompletedTrackers()
+        report(event: .click, screen: .trackersList, item: .doneTracker)
     }
 }
 
@@ -242,14 +252,14 @@ extension TrackersViewModel: HabitOrEventDelegate {
         if recordCount < currentRecordCount {
             if recordCount == 0 {
                 allRecords.forEach { [weak self] in
-                    try? self?.trackerRecordStore.deleteTrackerRecord($0, for: $0.date)
+                    try? self?.trackerRecordStore.removeTrackerRecord($0, for: $0.date)
                 }
             }
             
             if recordCount != 0 {
                 let newCount = currentRecordCount - recordCount
                 for i in 0..<newCount {
-                    try? trackerRecordStore.deleteTrackerRecord(allRecords[i], for: allRecords[i].date)
+                    try? trackerRecordStore.removeTrackerRecord(allRecords[i], for: allRecords[i].date)
                 }
             }
         }

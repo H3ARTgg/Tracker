@@ -8,9 +8,25 @@ final class TrackersViewController: UIViewController {
     private let searchField = UISearchTextField()
     private var searchCancelButton = UIButton()
     private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    private lazy var filterButton: UIButton = {
+        let button = UIButton.systemButton(with: .xMark, target: self, action: #selector(didTapFilterButton))
+        button.setImage(nil, for: .normal)
+        button.setTitle(NSLocalizedString(.localeKeys.filters, comment: ""), for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = .ypBlue
+        button.makeCornerRadius(16)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
     private var searchText: String = ""
     private var currentDate: Date = Date()
     var viewModel: TrackersViewModel?
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        viewModel?.report(event: .open, screen: .trackersList, item: nil)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,6 +44,11 @@ final class TrackersViewController: UIViewController {
         })
         
         isNeedToSetupNoContentUI()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        viewModel?.report(event: .close, screen: .trackersList, item: nil)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -69,12 +90,18 @@ final class TrackersViewController: UIViewController {
         viewModel?.showTrackersFor(date: currentDate, search: searchText)
     }
     
-    private func presentEditorFor(with cell: TrackersCell) {
+    @objc
+    private func didTapFilterButton() {
+        viewModel?.report(event: .click, screen: .trackersList, item: .filter)
+    }
+    
+    private func presentEditorFor(with trackerId: UUID) {
         resetSearchField()
         let habitOrEventVC = HabitOrEventViewController()
         habitOrEventVC.viewModel = viewModel?
-            .getHabitOrEventViewModel(with: cell)
+            .getHabitOrEventViewModel(with: trackerId)
         habitOrEventVC.modalPresentationStyle = .popover
+        viewModel?.report(event: .click, screen: .trackersList, item: .edit)
         present(habitOrEventVC, animated: true)
     }
     
@@ -83,14 +110,17 @@ final class TrackersViewController: UIViewController {
     private func isNeedToSetupNoContentUI() {
         if view.subviews.contains(noContentLabel) {
             removeNoContent()
+            setupFilterButtonLayout()
         }
         
         if viewModel?.trackersCategories.count == 0 {
             setupTitleAndImageIfNoContent(with: NSLocalizedString(.localeKeys.emptyStateTitle, comment: "Empty state title"), label: noContentLabel, imageView: noContentImageView, image: .noTrackers)
+            filterButton.removeFromSuperview()
         }
         
         if viewModel?.trackersCategories.count == 0 && searchField.isEditing {
             setupTitleAndImageIfNoContent(with: NSLocalizedString(.localeKeys.searchEmptyTitle, comment: "Search empty title"), label: noContentLabel, imageView: noContentImageView, image: UIImage(named: Constants.noResultImage)!)
+            filterButton.removeFromSuperview()
         }
         
     }
@@ -235,7 +265,7 @@ extension TrackersViewController: UIContextMenuInteractionDelegate {
                 }
                 
                 let editAction = UIAction(title: NSLocalizedString(.localeKeys.edit, comment: "")) { [weak self] _ in
-                    self?.presentEditorFor(with: cell)
+                    self?.presentEditorFor(with: cell.viewModel.id)
                 }
                 
                 let deleteAction = UIAction(title: NSLocalizedString(.localeKeys.delete, comment: ""), attributes: .destructive) { [weak self] _ in
@@ -277,7 +307,6 @@ extension TrackersViewController {
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .compact
         datePicker.makeCornerRadius(8)
-        datePicker.locale = Locale.current
         datePicker.addTarget(self, action: #selector(didDateChanged), for: .valueChanged)
         view.addSubview(datePicker)
         
@@ -359,13 +388,23 @@ extension TrackersViewController {
         let deleteAction = UIAlertAction(title: NSLocalizedString(.localeKeys.delete, comment: ""), style: .destructive) { [weak self] _ in
             self?.viewModel?.delete(trackerId)
         }
-        let cancelAction = UIAlertAction(title: NSLocalizedString(.localeKeys.cancel, comment: ""), style: .cancel) { _ in
-            alert.dismiss(animated: true)
-        }
+        let cancelAction = UIAlertAction(title: NSLocalizedString(.localeKeys.cancel, comment: ""), style: .cancel)
         
         alert.addAction(cancelAction)
         alert.addAction(deleteAction)
         present(alert, animated: true)
+    }
+    
+    private func setupFilterButtonLayout() {
+        view.addSubview(filterButton)
+        
+        NSLayoutConstraint.activate([
+            filterButton.heightAnchor.constraint(equalToConstant: 50),
+            filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -17),
+            filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            filterButton.leadingAnchor.constraint(lessThanOrEqualTo: view.leadingAnchor, constant: 150),
+            filterButton.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -150)
+        ])
     }
 }
 

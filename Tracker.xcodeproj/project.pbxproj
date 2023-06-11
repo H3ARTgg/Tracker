@@ -31,6 +31,8 @@
 		1D42ACE129EC36D300CC44BB /* HabitOrEventColorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D42ACE029EC36D300CC44BB /* HabitOrEventColorCell.swift */; };
 		1D42ACE329EC7F4200CC44BB /* HabitOrEventSupplementaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D42ACE229EC7F4200CC44BB /* HabitOrEventSupplementaryView.swift */; };
 		1D42ACE529EC84EC00CC44BB /* HabitOrEvent + CollectionViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D42ACE429EC84EC00CC44BB /* HabitOrEvent + CollectionViewDelegate.swift */; };
+		1D57EADB2A361DDD00B952DA /* FiltersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D57EADA2A361DDD00B952DA /* FiltersViewController.swift */; };
+		1D57EADD2A361E2300B952DA /* FiltersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D57EADC2A361E2300B952DA /* FiltersViewModel.swift */; };
 		1D6C5CD52A3288C6007A248B /* TrackerEdit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6C5CD42A3288C6007A248B /* TrackerEdit.swift */; };
 		1D6C5CDD2A3365ED007A248B /* ScreenShotsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6C5CDC2A3365ED007A248B /* ScreenShotsTests.swift */; };
 		1D6C5CE52A33669F007A248B /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 1D6C5CE42A33669F007A248B /* SnapshotTesting */; };
@@ -120,6 +122,8 @@
 		1D42ACE029EC36D300CC44BB /* HabitOrEventColorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitOrEventColorCell.swift; sourceTree = "<group>"; };
 		1D42ACE229EC7F4200CC44BB /* HabitOrEventSupplementaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitOrEventSupplementaryView.swift; sourceTree = "<group>"; };
 		1D42ACE429EC84EC00CC44BB /* HabitOrEvent + CollectionViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HabitOrEvent + CollectionViewDelegate.swift"; sourceTree = "<group>"; };
+		1D57EADA2A361DDD00B952DA /* FiltersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiltersViewController.swift; sourceTree = "<group>"; };
+		1D57EADC2A361E2300B952DA /* FiltersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiltersViewModel.swift; sourceTree = "<group>"; };
 		1D6C5CD42A3288C6007A248B /* TrackerEdit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerEdit.swift; sourceTree = "<group>"; };
 		1D6C5CDA2A3365ED007A248B /* TrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D6C5CDC2A3365ED007A248B /* ScreenShotsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenShotsTests.swift; sourceTree = "<group>"; };
@@ -281,6 +285,15 @@
 			path = "CollectionView Delegate + DataSource";
 			sourceTree = "<group>";
 		};
+		1D57EAD92A361DC600B952DA /* Filters */ = {
+			isa = PBXGroup;
+			children = (
+				1D57EADA2A361DDD00B952DA /* FiltersViewController.swift */,
+				1D57EADC2A361E2300B952DA /* FiltersViewModel.swift */,
+			);
+			path = Filters;
+			sourceTree = "<group>";
+		};
 		1D6C5CDB2A3365ED007A248B /* TrackerTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -326,18 +339,6 @@
 				1D03FF902A1D172100B3CF2A /* Pages.swift */,
 			);
 			path = Onboarding;
-			sourceTree = "<group>";
-		};
-		1DB41F262A16B7B200FB0F97 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				1DB41F272A16B7C700FB0F97 /* Tracker.swift */,
-				1DB41F292A16B7D300FB0F97 /* TrackerCategory.swift */,
-				1D0EB52129DDCCFD00767D8B /* TrackerRecord.swift */,
-				1DB41F2B2A16B82800FB0F97 /* DaysOfTheWeek.swift */,
-				1DB41E9B2A0486D200FB0F97 /* WeekDay.swift */,
-			);
-			path = Models;
 			sourceTree = "<group>";
 		};
 		1DC177E429E5B60200953BF2 /* NewTracker */ = {
@@ -431,6 +432,7 @@
 				1D03FF8F2A1CF17900B3CF2A /* Splash */,
 				1DB41EF52A0FCCFC00FB0F97 /* Onboarding */,
 				1DD7C20E29DB29670085B6A7 /* TabBar */,
+				1D57EAD92A361DC600B952DA /* Filters */,
 				1DD7C20B29DB27530085B6A7 /* Trackers */,
 				1DC177E429E5B60200953BF2 /* NewTracker */,
 				1DC8DAA729E5FF7600F6D39E /* HabitOrEvent */,
@@ -468,7 +470,11 @@
 		1DD7C20B29DB27530085B6A7 /* Trackers */ = {
 			isa = PBXGroup;
 			children = (
-				1DB41F262A16B7B200FB0F97 /* Models */,
+				1DB41F272A16B7C700FB0F97 /* Tracker.swift */,
+				1DB41F292A16B7D300FB0F97 /* TrackerCategory.swift */,
+				1D0EB52129DDCCFD00767D8B /* TrackerRecord.swift */,
+				1DB41E9B2A0486D200FB0F97 /* WeekDay.swift */,
+				1DB41F2B2A16B82800FB0F97 /* DaysOfTheWeek.swift */,
 				1D03FF8A2A1CD64900B3CF2A /* TrackersView */,
 				1D03FF8B2A1CD66B00B3CF2A /* TrackersCell */,
 				1D03FF8C2A1CD67700B3CF2A /* TrackersSupplementaryView */,
@@ -727,6 +733,7 @@
 				1DB41E902A04146800FB0F97 /* TrackerStore.swift in Sources */,
 				1D03FF9F2A27D57900B3CF2A /* CategoriesViewModel.swift in Sources */,
 				1D03FF912A1D172100B3CF2A /* Pages.swift in Sources */,
+				1D57EADB2A361DDD00B952DA /* FiltersViewController.swift in Sources */,
 				1D42ACE129EC36D300CC44BB /* HabitOrEventColorCell.swift in Sources */,
 				1D03FF992A2426EC00B3CF2A /* Choice.swift in Sources */,
 				1DD7C1FA29DB19810085B6A7 /* TrackersViewController.swift in Sources */,
@@ -735,6 +742,7 @@
 				1DD7C21529DB2C820085B6A7 /* UIColor + Extension.swift in Sources */,
 				1DB41F232A14213400FB0F97 /* Observable.swift in Sources */,
 				1D03FF8E2A1CF16A00B3CF2A /* SplashViewController.swift in Sources */,
+				1D57EADD2A361E2300B952DA /* FiltersViewModel.swift in Sources */,
 				1DC7D8AA29ED9D5000D9DC8A /* Date + Extension.swift in Sources */,
 				1D03FF932A2414DB00B3CF2A /* SplashViewModel.swift in Sources */,
 				1DB41E9A2A0456B700FB0F97 /* Model.xcdatamodeld in Sources */,
