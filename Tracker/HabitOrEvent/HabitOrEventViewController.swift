@@ -1,10 +1,10 @@
 import UIKit
 
+// TODO: - Доделать под MVVM (ячейки)
 final class HabitOrEventViewController: UIViewController {
     let emojiCellIdentifier = "emojiCell"
     let colorCellIdentifier = "colorCell"
     let tableViewCellIdentifier = "habitEventCell"
-    let cellsStrings = ["Категория", "Расписание"]
     let contentView = UIView()
     let scrollView = UIScrollView()
     let textField = UITextField()
@@ -12,63 +12,45 @@ final class HabitOrEventViewController: UIViewController {
     let tableView = UITableView()
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     let stackViewForButtons = UIStackView()
+    let stackViewForEdit = UIStackView()
+    let editRecordLabel = UILabel()
     var createButton = UIButton()
     var cancelButton = UIButton()
+    var editMinusButton = UIButton()
+    var editPlusButton = UIButton()
     var viewModel: HabitOrEventViewModel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
-
-        setupScrollViewAndContentView(scrollView: scrollView, contentView: contentView, withExtraSpace: UIScreen.main.bounds.height / 3)
+        if let isEditing = viewModel?.isEditing {
+            setupScrollViewAndContentView(scrollView: scrollView, contentView: contentView, withExtraSpace: UIScreen.main.bounds.height / 3, isEditing: isEditing)
+            setupRecordEditing(
+                with: viewModel?.recordText ?? "",
+                minusAction: #selector(didTapMinus),
+                plusAction: #selector(didTapPlus)
+            )
+        } else {
+            setupScrollViewAndContentView(scrollView: scrollView, contentView: contentView, withExtraSpace: UIScreen.main.bounds.height / 3)
+        }
         scrollView.delegate = self
-        setupTitleLabel(with: viewModel?.choice.rawValue ?? "")
+        
+        setupTitleLabel(with: makeTitleTextByChoice())
         setupTextField()
         setupTableView()
         setupCollectionView()
         setupButtonsWithSelectorsFor(done: #selector(didTapCreate), cancel: #selector(didTapCancel), with: stackViewForButtons)
+        setupBinds()
         
-        viewModel?.$stringForScheduleCell.bind(action: { [weak self] text in
-            if let cell = self?.tableView.cellForRow(at: IndexPath(row: 1, section: 0)) as? HabitOrEventCell {
-                if text == self?.cellsStrings[1] {
-                    if cell.contentView.subviews.count == 3 {
-                        cell.removeDetailLabel()
-                    }
-                } else {
-                    cell.detailLabelText = text
-                }
-            }
-            self?.isReadyForCreate()
-            self?.tableView.reloadData()
-        })
-        
-        viewModel?.$stringCategories.bind(action: { [weak self] _ in
-            self?.isReadyForCreate()
-            self?.tableView.reloadData()
-        })
-        
-        viewModel?.$oldSelectedColorIndex.bind(action: { [weak self] indexPath in
-            guard let selectedCell = self?.collectionView.cellForItem(at: indexPath) as? HabitOrEventColorCell else {
-                assertionFailure("No cell for selected indexPath: \(indexPath)")
+        if case .edit(_) = viewModel?.choice {
+            textField.text = viewModel?.getNameOfTracker()
+            guard let cell = self.tableView.dequeueReusableCell(withIdentifier: tableViewCellIdentifier, for: IndexPath(row: 0, section: 0)) as? HabitOrEventCell else {
+                assertionFailure("No habitEventCell")
                 return
             }
-            selectedCell.deselectColor()
-        })
-        
-        viewModel?.$oldSelectedEmojiIndex.bind(action: { [weak self] indexPath in
-            guard let selectedCell = self?.collectionView.cellForItem(at: indexPath) as? HabitOrEventEmojiCell else {
-                assertionFailure("No cell for selected indexPath: \(indexPath)")
-                return
-            }
-            selectedCell.deselectEmoji()
-        })
-        
-        viewModel?.$selectedCategory.bind(action: {[weak self] text in
-            if let text = text {
-                guard let cell = self?.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? HabitOrEventCell else { return }
-                cell.detailLabelText = text
-            }
-        })
+            cell.detailLabelText = viewModel?.selectedCategory ?? ""
+            isReadyForCreate()
+        }
     }
     
     @objc
@@ -82,13 +64,47 @@ final class HabitOrEventViewController: UIViewController {
     private func didTapCreate() {
         viewModel?.didTapCreateButton(text: textField.text)
         weak var presentingVC = self.presentingViewController
-        dismiss(animated: true)
-        presentingVC?.dismiss(animated: true)
+        if case .edit(_) = viewModel?.choice {
+            dismiss(animated: true)
+        } else {
+            dismiss(animated: true)
+            presentingVC?.dismiss(animated: true)
+        }
+    }
+    
+    @objc
+    private func didTapPlus() {
+        viewModel?.increaseRecordCount()
+    }
+    
+    @objc
+    private func didTapMinus() {
+        viewModel?.decreaseRecordCount()
     }
     
     @objc
     func didInteractionWithTextField() {
         isReadyForCreate()
+    }
+    
+    private func makeTitleTextByChoice() -> String {
+        switch viewModel?.choice {
+        case .habit:
+            return NSLocalizedString(.localeKeys.habitNew, comment: "ViewController title for new habit")
+        case .event:
+            return NSLocalizedString(.localeKeys.eventNew, comment: "ViewController title for new irregular event")
+        case .edit(let choice):
+            switch choice {
+            case .habit:
+                return NSLocalizedString(.localeKeys.habitEdit, comment: "")
+            case .event:
+                return NSLocalizedString(.localeKeys.eventEdit, comment: "")
+            default:
+                return ""
+            }
+        default:
+            return ""
+        }
     }
     
     private func deactivateCreateButton() {
@@ -101,6 +117,50 @@ final class HabitOrEventViewController: UIViewController {
         createButton.backgroundColor = .ypBlack
         createButton.setTitleColor(.ypWhite, for: .normal)
         createButton.isUserInteractionEnabled = true
+    }
+    
+    private func setupBinds() {
+        viewModel?.$stringForScheduleCell.bind(action: { [weak self] text in
+            if let cell = self?.tableView.cellForRow(at: IndexPath(row: 1, section: 0)) as? HabitOrEventCell {
+                if let text = text {
+                    cell.detailLabelText = text
+                } else {
+                    cell.removeDetailLabel()
+                }
+            }
+            self?.isReadyForCreate()
+            self?.tableView.reloadData()
+        })
+        
+        viewModel?.$stringCategories.bind(action: { [weak self] _ in
+            self?.isReadyForCreate()
+            self?.tableView.reloadData()
+        })
+        
+        viewModel?.$oldSelectedColorIndex.bind(action: { [weak self] indexPath in
+            guard let selectedCell = self?.collectionView.cellForItem(at: indexPath) as? HabitOrEventColorCell else {
+                return
+            }
+            selectedCell.deselectColor()
+        })
+        
+        viewModel?.$oldSelectedEmojiIndex.bind(action: { [weak self] indexPath in
+            guard let selectedCell = self?.collectionView.cellForItem(at: indexPath) as? HabitOrEventEmojiCell else {
+                return
+            }
+            selectedCell.deselectEmoji()
+        })
+        
+        viewModel?.$selectedCategory.bind(action: {[weak self] text in
+            if let text = text {
+                guard let cell = self?.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? HabitOrEventCell else { return }
+                cell.detailLabelText = text
+            }
+        })
+        
+        viewModel?.$recordText.bind(action: { [weak self] text in
+            self?.editRecordLabel.text = text
+        })
     }
     
     func isReadyForCreate() {
@@ -149,7 +209,7 @@ extension HabitOrEventViewController: UITextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         textField.attributedPlaceholder = NSAttributedString(
-            string: "Введите название трекера",
+            string: NSLocalizedString(.localeKeys.typeTrackerTitle, comment: ""),
             attributes: [NSAttributedString.Key.foregroundColor : UIColor.ypGray!])
         isReadyForCreate()
     }

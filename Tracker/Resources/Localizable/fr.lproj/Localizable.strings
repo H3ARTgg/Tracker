@@ -1,0 +1,58 @@
+// Titles
+"category.new" = "Nouvelle catégorie";
+"habit.new" = "Nouvelle habitude";
+"event.new" = "Nouvel événement irrégulier";
+"tracker.creation" = "Création d'un traceur";
+"habit.edit" = "Modifier une habitude";
+"event.edit" = "Modification d'un événement irrégulier";
+
+// Empty States
+"emptyState.title" = "Que suivrons-nous ?";
+"searchEmpty.title" = "Rien n'a été trouvé";
+"categoryEmpty.title" = "Les habitudes et les événements peuvent être combinés dans le sens";
+
+// Placeholders
+"type.category.name" = "Saisissez le nom de la catégorie";
+"type.tracker.title" = "Saisissez le nom du traceur";
+
+// Other
+"statistic" = "Statistiques";
+"category" = "Catégorie";
+"schedule" = "Calendrier";
+"habit" = "Habitude";
+"event" = "Événement irrégulier";
+"trackers" = "Traqueurs";
+"search" = "Recherche";
+"warning" = "Limite de 38 caractères";
+"create" = "Créer";
+"cancel" = "Annuler";
+"emoji" = "Émoji";
+"color" = "Couleur";
+"category.add" = "Ajouter une catégorie";
+"done" = "Prêt";
+"pinned" = "Épinglé";
+"pin" = "Épingler";
+"unpin" = "Détacher";
+"edit" = "Modifier";
+"delete" = "Supprimer";
+"delete.confirmation" = "Voulez-vous vraiment supprimer le traceur?";
+"trackers.completed" = "Traqueurs terminés";
+"statistic.nothing" = "Rien à analyser";
+"filters" = "Filtres";
+
+// Days of the week
+"monday.long" = "Lundi";
+"monday.short" = "Lun";
+"tuesday.long" = "Mardi";
+"tuesday.short" = "Mar";
+"wednesday.long" = "Mercredi";
+"wednesday.short" = "Mer";
+"thursday.long" = "Jeudi";
+"thursday.short" = "Jeu";
+"friday.long" = "Vendredi";
+"friday.short" = "Ven";
+"saturday.long" = "Samedi";
+"saturday.short" = "Sam";
+"sunday.long" = "Dimanche";
+"sunday.short" = "Dim";
+"everyday" = "Tous les jours";

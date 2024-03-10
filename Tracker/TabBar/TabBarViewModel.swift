@@ -1,19 +1,24 @@
 import Foundation
 
 final class TabBarViewModel {
-    /// Возвращает ViewModel для TrackersViewController
-    func getViewModelForTrackers() -> TrackersViewModel {
+    /// Возвращает ViewModels для TrackersViewController и StatisticViewController
+    func getViewModels() -> (TrackersViewModel, StatisticViewModel) {
+        let trackerRecordStore = TrackerRecordStore()
         let trackerCategoryStore = TrackerCategoryStore()
         let trackerStore = TrackerStore(trackerCategoryStore: trackerCategoryStore)
-        let trackerRecordStore = TrackerRecordStore()
         let weekDayStore = WeekDayStore()
+        let analyticsService = AnalyticsService()
         let trackersViewModel = TrackersViewModel(
             date: Date(),
             trackerCategoryStore: trackerCategoryStore,
             trackerStore: trackerStore,
             trackerRecordStore: trackerRecordStore,
-            weekDayStore: weekDayStore
+            weekDayStore: weekDayStore,
+            analyticsService: analyticsService
         )
-        return trackersViewModel
+        
+        let statisticViewModel = StatisticViewModel(statisticRecords: trackerRecordStore)
+        trackersViewModel.delegate = statisticViewModel
+        return (trackersViewModel, statisticViewModel)
     }
 }

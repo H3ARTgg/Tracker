@@ -1,7 +1,7 @@
 import UIKit
 
 final class NewCategoryViewController: UIViewController {
-    private let placeholderString = "Введите название категории"
+    private let placeholderString = NSLocalizedString(.localeKeys.typeCategoryName, comment: "Placeholder for text field")
     private let textField = UITextField()
     private var doneButton = UIButton()
     var viewModel: NewCategoryViewModel?
@@ -9,7 +9,7 @@ final class NewCategoryViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
-        setupTitleLabel(with: "Новая категория")
+        setupTitleLabel(with: NSLocalizedString(.localeKeys.categoryNew, comment: "New category title"))
         setupTextField()
         setupDoneButton()
     }
@@ -103,7 +103,7 @@ extension NewCategoryViewController {
         doneButton = .systemButton(with: .chevronLeft, target: self, action: #selector(didTapDoneButton))
         doneButton.isUserInteractionEnabled = false
         doneButton.setImage(nil, for: .normal)
-        doneButton.setTitle("Готово", for: .normal)
+        doneButton.setTitle(NSLocalizedString(.localeKeys.done, comment: "Title for done button"), for: .normal)
         doneButton.setTitleColor(.ypBlack, for: .normal)
         doneButton.backgroundColor = .ypGray
         doneButton.titleLabel?.textAlignment = .center
